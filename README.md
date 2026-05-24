@@ -85,3 +85,56 @@ All skill files use lowercase, hyphenated names that match their function. When 
 ---
 
 *Part of the MrMortgageMan AI infrastructure. For a high-level map, see the `mrmortgageman-api` org profile README.*
+
+---
+
+## Cowork Operator Pack — Phase 2
+
+Phase 2 adds 13 operator skills focused on session management, system health, data integrity,
+and cowork workflow governance. All skills live in `skills/cowork-operator-pack/`.
+
+| File | Purpose | Typical Use Cases | Status |
+|---|---|---|---|
+| `01-source-of-truth-registry-auditor.md` | Audit which system owns each data type and surface conflicts | Data ownership disputes, new integration onboarding, cross-system sync prep | ✅ Live |
+| `02-cowork-session-closer.md` | Close a cowork session with a structured log and next-session boot queue | End of every cowork session | ✅ Live |
+| `03-archive-triage-decay-rater.md` | Score archived content by accuracy, relevance, and reusability | Workspace cleanup, content library audits, vault triage | ✅ Live |
+| `04-open-decisions-manager.md` | Track, surface, and force resolution on unresolved decisions | Ongoing decision governance, session close, queue building | ✅ Live |
+| `05-signalstrike-scouting-report.md` | Build a scored outreach-ready dossier on a prospect before Touch 0 | Agent evaluation, prospect scoring, outreach prep | ✅ Live |
+| `06-pending-review-router.md` | Route pending items to the right owner and next action | Review queue management, approval routing, session triage | ✅ Live |
+| `07-cowork-queue-manager.md` | Build, prioritize, and time-box the active session queue | Session start, mid-session triage, carry-forward management | ✅ Live |
+| `08-mcp-health-check.md` | Verify all MCP server connections before session work begins | Session boot, tool failure diagnosis, pre-write safety check | ✅ Live |
+| `09-context-stack-refresher.md` | Reload prior session context so work continues without re-briefing | Every session start that follows a prior cowork session | ✅ Live |
+| `10-crm-notion-file-sync-checker.md` | Verify HubSpot and Notion records are in sync field by field | Contact and deal data integrity checks, pre-outreach sync audit | ✅ Live |
+| `11-scheduled-boot-briefing-builder.md` | Build a five-section morning briefing for scheduled or recurring sessions | Daily boot, recurring scheduled session setup | ✅ Live |
+| `12-notion-mirror-gatekeeper.md` | Gate all Notion writes with a classification and approval checkpoint | Any session that writes to Notion, cross-system update workflows | ✅ Live |
+| `13-github-repository-registry-builder.md` | Build and maintain the org-level GitHub repository registry | Repo onboarding, org audit, skill-to-repo mapping | ✅ Live |
+
+### Phase 2 Repo Structure Addition
+
+```
+skills/
+└── cowork-operator-pack/
+    ├── 01-source-of-truth-registry-auditor.md
+    ├── 02-cowork-session-closer.md
+    ├── 03-archive-triage-decay-rater.md
+    ├── 04-open-decisions-manager.md
+    ├── 05-signalstrike-scouting-report.md
+    ├── 06-pending-review-router.md
+    ├── 07-cowork-queue-manager.md
+    ├── 08-mcp-health-check.md
+    ├── 09-context-stack-refresher.md
+    ├── 10-crm-notion-file-sync-checker.md
+    ├── 11-scheduled-boot-briefing-builder.md
+    ├── 12-notion-mirror-gatekeeper.md
+    └── 13-github-repository-registry-builder.md
+```
+
+### Phase 2 Skill Chains
+
+**Session open chain:** `08-mcp-health-check` → `09-context-stack-refresher` → `07-cowork-queue-manager`
+
+**Session close chain:** `04-open-decisions-manager` → `06-pending-review-router` → `02-cowork-session-closer`
+
+**Outreach prep chain:** `05-signalstrike-scouting-report` → `cold-email` → `revops`
+
+**Data integrity chain:** `01-source-of-truth-registry-auditor` → `10-crm-notion-file-sync-checker` → `12-notion-mirror-gatekeeper`

@@ -26,3 +26,35 @@ Every other skill depends on it.
 - HubSpot is the source of truth for all contacts and deals.
 - Scott approves all cross-system writes.
 - Template variables use double braces.
+
+## Cowork Operator Pack (Phase 2)
+
+Skills live in skills/cowork-operator-pack/. Load them by number and name.
+
+### Session management
+- 02-cowork-session-closer — Run at end of every session. Produces a log and boot queue.
+- 07-cowork-queue-manager — Build and prioritize the session queue. Confirm with Scott before starting.
+- 09-context-stack-refresher — Run at session start to reload prior session context.
+- 11-scheduled-boot-briefing-builder — Use for recurring or scheduled session boot workflows.
+
+### System health and data integrity
+- 08-mcp-health-check — Run before any session that depends on live MCP data. Required before cross-system writes.
+- 01-source-of-truth-registry-auditor — Run when ownership of a data type is in question.
+- 10-crm-notion-file-sync-checker — Run before using Notion contact or deal data for decisions.
+- 12-notion-mirror-gatekeeper — Required checkpoint before any write to a Notion mirror page.
+
+### Decision and review governance
+- 04-open-decisions-manager — Track all unresolved decisions. Every open item needs an owner and a due date.
+- 06-pending-review-router — Route pending items to the right owner. No item leaves without an action.
+- 03-archive-triage-decay-rater — Score archived content before reuse or deletion.
+
+### Outreach and registry
+- 05-signalstrike-scouting-report — Score and profile a prospect before any outreach is written.
+- 13-github-repository-registry-builder — Maintain the org-level repo registry. Registry first, code second.
+
+### Cowork operator hard rules
+- Run 08-mcp-health-check before any session that reads from or writes to HubSpot or Notion.
+- Run 12-notion-mirror-gatekeeper before every Notion write. No exceptions.
+- Never write to a Notion mirror before confirming the HubSpot authoritative value.
+- Open decisions must have an owner. Decisions deferred more than twice escalate to Scott.
+- Session queues are confirmed by Scott before work begins.
