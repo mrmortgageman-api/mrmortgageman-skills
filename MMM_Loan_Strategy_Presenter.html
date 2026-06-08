@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMM Loan Strategy Presenter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#f7f6f2;--surf:#f9f8f5;--soff:#f3f0ec;--div:#dcd9d5;--bdr:#d4d1ca;
+  --txt:#28251d;--mut:#7a7974;--fnt:#bab9b4;--pri:#01696f;--prih:#cedcd8;
+  --navy:#1e3a5f;--gold:#d19900;--green:#437a22;
+}
+[data-theme=dark]{
+  --bg:#171614;--surf:#1c1b19;--soff:#1d1c1a;--div:#262523;--bdr:#393836;
+  --txt:#cdccca;--mut:#797876;--fnt:#5a5957;--pri:#4f98a3;--prih:#313b3b;
+  --navy:#1e3a5f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);transition:background .18s,color .18s}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+a{text-decoration:none}
+input{font:inherit}
+
+/* Header */
+.hdr{background:var(--navy);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.hl{display:flex;align-items:center;gap:12px}
+.logo{width:50px;height:50px;object-fit:contain;border-radius:6px}
+.ht{font-family:'Instrument Serif',Georgia,serif;font-size:1.15rem;font-style:italic;color:#fff}
+.hm{font-size:.7rem;color:rgba(255,255,255,.6);margin-top:2px}
+.hr{display:flex;gap:8px;align-items:center}
+.tbtn{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;transition:all .18s}
+.tbtn:hover{background:rgba(255,255,255,.18);color:#fff}
+.pbtn{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);font-size:.78rem;color:rgba(255,255,255,.85);transition:all .18s}
+.pbtn:hover{background:rgba(255,255,255,.2);color:#fff}
+.edit-toggle{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);font-size:.78rem;color:rgba(255,255,255,.85);transition:all .18s;display:flex;align-items:center;gap:6px}
+.edit-toggle:hover{background:rgba(255,255,255,.2);color:#fff}
+.edit-toggle.active{background:var(--pri);border-color:var(--pri);color:#fff}
+
+/* Live edit drawer */
+.edit-drawer{background:var(--surf);border-bottom:2px solid var(--pri);padding:0;max-height:0;overflow:hidden;transition:max-height .3s cubic-bezier(.16,1,.3,1),padding .3s}
+.edit-drawer.open{max-height:500px;padding:20px}
+.edit-drawer-inner{max-width:1080px;margin:0 auto}
+.edit-title{font-size:.75rem;font-weight:600;color:var(--pri);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.edit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+.edit-field{display:flex;flex-direction:column;gap:4px}
+.edit-label{font-size:.65rem;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.edit-input{padding:7px 10px;border:1px solid var(--bdr);border-radius:6px;background:var(--bg);color:var(--txt);font-size:.82rem;transition:border-color .15s}
+.edit-input:focus{outline:none;border-color:var(--pri)}
+.edit-section-label{font-size:.65rem;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:4px}
+.scenario-inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.scenario-input-group{background:var(--soff);border-radius:8px;padding:10px}
+.scenario-input-label{font-size:.68rem;font-weight:600;color:var(--txt);margin-bottom:8px;font-family:'Instrument Serif',Georgia,serif;font-style:italic}
+.edit-recalc{display:inline-flex;align-items:center;gap:6px;background:var(--pri);color:#fff;font-size:.78rem;font-weight:600;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;transition:opacity .15s;margin-top:4px}
+.edit-recalc:hover{opacity:.85}
+.edit-note{font-size:.65rem;color:var(--mut);margin-top:8px}
+
+/* Layout */
+.wrap{max-width:1080px;margin:0 auto;padding:24px 18px 60px}
+
+/* Report header */
+.rh{margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--div)}
+.rt{font-family:'Instrument Serif',Georgia,serif;font-size:1.55rem;font-style:italic;margin-bottom:6px;color:var(--txt)}
+.rs{font-size:.75rem;color:var(--mut);display:flex;gap:14px;flex-wrap:wrap}
+.rs span{display:flex;align-items:center;gap:4px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--pri);flex-shrink:0}
+
+/* Section label */
+.sl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);font-weight:600;margin-bottom:10px}
+
+/* KPI row */
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:22px}
+.kc{background:var(--surf);border:1px solid rgba(0,0,0,.07);border-radius:10px;padding:14px;transition:all .2s}
+[data-theme=dark] .kc{border-color:rgba(255,255,255,.06)}
+.kl{font-size:.65rem;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kv{font-size:1.25rem;font-weight:700;line-height:1;color:var(--txt)}
+.ks{font-size:.65rem;color:var(--fnt);margin-top:3px}
+
+/* Scenario grid */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:12px;margin-bottom:22px}
+.sc{background:var(--surf);border:1.5px solid rgba(0,0,0,.07);border-radius:14px;padding:17px;transition:all .2s;cursor:pointer;position:relative}
+[data-theme=dark] .sc{border-color:rgba(255,255,255,.06)}
+.sc:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:var(--pri);transform:translateY(-1px)}
+.sc.ft{border:2px solid var(--pri);background:color-mix(in srgb,var(--pri) 4%,var(--surf))}
+.sc.active-pick{border:2.5px solid var(--green)!important;background:color-mix(in srgb,var(--green) 5%,var(--surf))!important;box-shadow:0 0 0 3px rgba(67,122,34,.15)!important}
+.sc.active-pick .sn{color:var(--green)}
+.pick-indicator{display:none;position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--green);align-items:center;justify-content:center}
+.sc.active-pick .pick-indicator{display:flex}
+.pick-hint{font-size:.62rem;color:var(--mut);margin-bottom:8px;text-align:center}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.sn{font-family:'Instrument Serif',Georgia,serif;font-size:1.05rem;font-style:italic;color:var(--txt);transition:color .2s}
+.sb{font-size:.62rem;padding:2px 7px;border-radius:50px;background:var(--prih);color:var(--pri);font-weight:600;white-space:nowrap}
+.sm{display:grid;gap:7px}
+.mr{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:7px;border-bottom:1px solid var(--div)}
+.mr:last-child{border-bottom:none;padding-bottom:0}
+.ml2{font-size:.75rem;color:var(--mut)}
+.mv{font-size:.75rem;font-weight:600;color:var(--txt)}
+.mv.p{color:var(--pri)}
+.mv.lg{font-size:.88rem;font-weight:700}
+.mv.nt{font-size:.65rem;font-weight:400;color:var(--mut);text-align:right;max-width:145px;line-height:1.4}
+
+/* Recommendation */
+.rec{background:var(--surf);border:2px solid var(--pri);border-radius:14px;padding:20px;margin-bottom:22px}
+.rec-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rec-badge{font-size:.65rem;padding:3px 10px;border-radius:50px;background:var(--prih);color:var(--pri);font-weight:600;white-space:nowrap}
+.rec-label{font-family:'Instrument Serif',Georgia,serif;font-size:1.1rem;font-style:italic;color:var(--txt)}
+.rec-body{font-size:.85rem;color:var(--txt);line-height:1.7}
+
+/* Charts */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:22px}
+.cc{background:var(--surf);border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:17px}
+[data-theme=dark] .cc{border-color:rgba(255,255,255,.06)}
+.ct{font-size:.88rem;font-weight:600;margin-bottom:3px;color:var(--txt)}
+.cd{font-size:.65rem;color:var(--mut);margin-bottom:12px}
+.cw{position:relative;height:185px}
+
+/* Table */
+.tc{background:var(--surf);border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:17px;margin-bottom:22px;overflow-x:auto}
+[data-theme=dark] .tc{border-color:rgba(255,255,255,.06)}
+.tt{font-size:.88rem;font-weight:600;margin-bottom:12px;color:var(--txt)}
+table{width:100%;border-collapse:collapse}
+th{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:600;text-align:right;padding:6px 10px 8px;border-bottom:1px solid var(--bdr)}
+th:first-child{text-align:left}
+td{font-size:.75rem;padding:7px 10px;text-align:right;border-bottom:1px solid var(--div);color:var(--txt)}
+td:first-child{text-align:left;font-weight:600}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--soff)}
+.thl{color:var(--pri)}
+
+/* Equity bars */
+.eb{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.er{display:grid;grid-template-columns:155px 1fr 95px;align-items:center;gap:10px}
+.el{font-size:.75rem;font-weight:600;color:var(--txt)}
+.et{height:23px;background:var(--soff);border-radius:50px;overflow:hidden}
+.ef{height:100%;border-radius:50px;transition:width 1s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;padding-left:10px}
+.efl{font-size:.62rem;color:#fff;font-weight:600;white-space:nowrap}
+.ev{font-size:.75rem;font-weight:700;text-align:right;color:var(--txt)}
+
+/* Next steps */
+.ns{background:var(--navy);border-radius:14px;padding:20px;margin-bottom:22px}
+.ns-title{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.ns-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.ns-step{display:flex;align-items:flex-start;gap:10px}
+.ns-num{width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ns-text{font-size:.8rem;color:rgba(255,255,255,.85);line-height:1.5}
+.ns-text strong{color:#fff}
+.cal-btn{display:inline-flex;align-items:center;gap:8px;background:var(--pri);color:#fff;font-size:.8rem;font-weight:600;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s}
+.cal-btn:hover{opacity:.85}
+
+/* Disclaimer */
+.disc{font-size:.65rem;color:var(--fnt);border-top:1px solid var(--div);padding-top:16px;line-height:1.7}
+
+/* Print */
+@media print{
+  .tbtn,.pbtn,.cal-btn,.edit-toggle,.edit-drawer,.pick-hint{display:none!important}
+  .hdr,.ns{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff}
+  .sc{cursor:default}
+  .sc:hover{transform:none;box-shadow:none}
+}
+
+/* Responsive */
+@media(max-width:768px){
+  .cg{grid-template-columns:1fr}
+  .scenario-inputs{grid-template-columns:1fr 1fr}
+}
+@media(max-width:540px){
+  .er{grid-template-columns:110px 1fr 70px}
+  .kg{grid-template-columns:1fr 1fr}
+  .scenario-inputs{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hl">
+    <img class="logo"
+      src="https://raw.githubusercontent.com/mrmortgageman-api/mrmortgageman-skills/main/MMM%20LOGOs%20(2).PNG"
+      alt="MrMortgageMan" onerror="this.style.display='none'">
+    <div>
+      <div class="ht">MrMortgageMan — Loan Strategy</div>
+      <div class="hm" id="hSubtitle"></div>
+    </div>
+  </div>
+  <div class="hr">
+    <button class="edit-toggle" id="editToggle" onclick="toggleDrawer()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit live
+    </button>
+    <button class="tbtn" id="tb" aria-label="Toggle dark mode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="pbtn" onclick="window.print()">Print / Save PDF</button>
+  </div>
+</header>
+
+<!-- LIVE EDIT DRAWER -->
+<div class="edit-drawer" id="editDrawer">
+  <div class="edit-drawer-inner">
+    <div class="edit-title">Live edit — changes update the presentation instantly</div>
+    <div class="edit-grid">
+      <div class="edit-field">
+        <label class="edit-label">Purchase price</label>
+        <input class="edit-input" id="ei-price" type="number" step="10000" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Down payment ($)</label>
+        <input class="edit-input" id="ei-down" type="number" step="5000" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Tax (monthly)</label>
+        <input class="edit-input" id="ei-tax" type="number" step="50" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Insurance (monthly)</label>
+        <input class="edit-input" id="ei-ins" type="number" step="10" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">HOA (monthly)</label>
+        <input class="edit-input" id="ei-hoa" type="number" step="50" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Rental income (monthly)</label>
+        <input class="edit-input" id="ei-rent" type="number" step="100" oninput="liveUpdate()">
+      </div>
+    </div>
+    <div class="edit-section-label">Scenario rates & points</div>
+    <div class="scenario-inputs">
+      <div class="scenario-input-group">
+        <div class="scenario-input-label">Current loan</div>
+        <div class="edit-field" style="margin-bottom:6px">
+          <label class="edit-label">Rate (%)</label>
+          <input class="edit-input" id="ei-r0" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Points</label>
+          <input class="edit-input" id="ei-p0" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+      </div>
+      <div class="scenario-input-group">
+        <div class="scenario-input-label">Conservative</div>
+        <div class="edit-field" style="margin-bottom:6px">
+          <label class="edit-label">Rate (%)</label>
+          <input class="edit-input" id="ei-r1" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Points</label>
+          <input class="edit-input" id="ei-p1" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+      </div>
+      <div class="scenario-input-group">
+        <div class="scenario-input-label">Balanced</div>
+        <div class="edit-field" style="margin-bottom:6px">
+          <label class="edit-label">Rate (%)</label>
+          <input class="edit-input" id="ei-r2" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Points</label>
+          <input class="edit-input" id="ei-p2" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+      </div>
+      <div class="scenario-input-group">
+        <div class="scenario-input-label">Wealth accelerator</div>
+        <div class="edit-field" style="margin-bottom:6px">
+          <label class="edit-label">Rate (%)</label>
+          <input class="edit-input" id="ei-r3" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Points</label>
+          <input class="edit-input" id="ei-p3" type="number" step="0.125" oninput="liveUpdate()">
+        </div>
+      </div>
+    </div>
+    <div class="edit-note">All fields update the presentation in real time. No reload needed. Toggle off to hide this panel during screen share.</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="wrap">
+
+  <div class="rh">
+    <div class="rt" id="rTitle"></div>
+    <div class="rs" id="rSub"></div>
+  </div>
+
+  <div class="sl">Key metrics at a glance</div>
+  <div class="kg" id="kg"></div>
+
+  <div class="sl">Scenario breakdown — <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:.7rem;color:var(--mut)">click any card to highlight it during your call</span></div>
+  <div class="sg" id="sg"></div>
+
+  <div class="rec">
+    <div class="rec-top">
+      <span class="rec-badge">Scott's recommendation</span>
+      <span class="rec-label" id="recLabel"></span>
+    </div>
+    <div class="rec-body" id="recBody"></div>
+  </div>
+
+  <div class="cg">
+    <div class="cc">
+      <div class="ct">Monthly PITIA by scenario</div>
+      <div class="cd">Principal, interest, taxes & insurance</div>
+      <div class="cw"><canvas id="c1"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="ct">Remaining balance over 10 years</div>
+      <div class="cd">Amortization trajectory</div>
+      <div class="cw"><canvas id="c2"></canvas></div>
+    </div>
+  </div>
+
+  <div class="tc">
+    <div class="tt">Full scenario comparison</div>
+    <table id="tbl"></table>
+  </div>
+
+  <div class="sl">Projected equity at 10 years</div>
+  <div class="eb" id="eb"></div>
+
+  <div class="ns">
+    <div class="ns-title">Your next steps</div>
+    <div class="ns-steps">
+      <div class="ns-step">
+        <div class="ns-num">1</div>
+        <div class="ns-text"><strong>Application submitted.</strong> You are already in the system and moving forward.</div>
+      </div>
+      <div class="ns-step">
+        <div class="ns-num">2</div>
+        <div class="ns-text"><strong>Pre-approval letter</strong> will be in your inbox within 24 hours.</div>
+      </div>
+      <div class="ns-step">
+        <div class="ns-num">3</div>
+        <div class="ns-text"><strong>Book your Pre-Offer Strategy Call.</strong> We lock in live pricing, review buydown options, and make sure you are ready before any offer goes out.</div>
+      </div>
+    </div>
+    <a class="cal-btn" href="https://calendly.com/scott-thompson-nafinc/pre-offer-strategy-call" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Book your strategy call
+    </a>
+  </div>
+
+  <div class="disc">
+    This Total Cost Analysis is for education and planning only. Figures are estimates based on stated assumptions and are not a loan approval, rate lock, or commitment to lend. Final terms depend on verified credit, income, assets, property, underwriting, program guidelines, and market conditions. Expected rental income does not guarantee qualification.<br><br>
+    Prepared by Scott W Thompson | MrMortgageMan™ · NMLS #1864494 · New American Funding · 925-512-5626
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   DATA — Claude populates this object when generating the file.
+   You can also edit these values directly and save to update.
+   ============================================================ */
+const DATA = {
+  borrowerName:  "[BORROWER_NAME]",
+  subtitle:      "[FILE_SUBTITLE]",
+  reportDate:    "[REPORT_DATE]",
+  fileTypeLabel: "[FILE_TYPE_LABEL]",
+  loanType:      "[LOAN_TYPE]",
+  inv:           false,
+  purchasePrice: 0,
+  downPayment:   0,
+  taxMonthly:    0,
+  insMonthly:    0,
+  hoaMonthly:    0,
+  rentMonthly:   0,
+  recScenario:   "[RECOMMENDATION_SCENARIO]",
+  recText:       "[RECOMMENDATION_TEXT]",
+  scenarios: [
+    { label:"Current loan",       rate:0, pts:0, ctc:0 },
+    { label:"Conservative",       rate:0, pts:0, ctc:0 },
+    { label:"Balanced",           rate:0, pts:0, ctc:0, ft:true },
+    { label:"Wealth accelerator", rate:0, pts:0, ctc:0 },
+  ]
+};
+
+/* ============================================================
+   MATH ENGINE
+   ============================================================ */
+function calcPI(loan, rate, years) {
+  if (!loan || !rate) return 0;
+  const r = rate / 1200, n = years * 12;
+  return loan * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n)-1);
+}
+
+function buildCurve(loan, rate) {
+  if (!loan || !rate) return Array(11).fill(0);
+  const r = rate / 1200, pmt = calcPI(loan, rate, 30);
+  let b = loan;
+  const pts = [Math.round(b)];
+  for (let m = 1; m <= 120; m++) {
+    b -= (pmt - b * r);
+    if (m % 12 === 0) pts.push(Math.round(b));
+  }
+  return pts;
+}
+
+function buildScenarios(d) {
+  const fixed = d.taxMonthly + d.insMonthly + d.hoaMonthly;
+  return d.scenarios.map(s => {
+    const p   = calcPI(d.loanAmount || (d.purchasePrice - d.downPayment), s.rate, 30);
+    const pit = p + fixed;
+    const r   = s.rate / 1200;
+    let b = d.loanAmount || (d.purchasePrice - d.downPayment);
+    let ti = 0, tp = 0;
+    for (let m = 1; m <= 120; m++) {
+      const interest  = b * r;
+      const principal = p - interest;
+      ti += interest; tp += principal; b -= principal;
+    }
+    return {
+      ...s,
+      pi:  Math.round(p),
+      pit: Math.round(pit),
+      hi:  Math.round(ti),
+      hp:  Math.round(tp),
+      rb:  Math.round(b),
+      eq:  Math.round(d.downPayment + tp),
+      nc:  Math.round(d.rentMonthly - pit),
+      cv:  buildCurve(d.loanAmount || (d.purchasePrice - d.downPayment), s.rate)
+    };
+  });
+}
+
+/* ============================================================
+   FORMATTERS & COLORS
+   ============================================================ */
+const f  = n => '$' + Math.round(n).toLocaleString();
+const fk = n => '$' + Math.round(n/1000) + 'K';
+const CL = ['#1e3a5f','#01696f','#437a22','#d19900'];
+const CD = ['#5591c7','#4f98a3','#6daa45','#e8af34'];
+const gc = () => document.documentElement.getAttribute('data-theme') === 'dark' ? CD : CL;
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+(function(){
+  const btn = document.getElementById('tb');
+  const root = document.documentElement;
+  let theme = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  root.setAttribute('data-theme', theme);
+  btn.addEventListener('click', () => {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    btn.innerHTML = theme === 'dark'
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    rebuildCharts();
+  });
+})();
+
+/* ============================================================
+   EDIT DRAWER
+   ============================================================ */
+function toggleDrawer() {
+  const drawer  = document.getElementById('editDrawer');
+  const toggle  = document.getElementById('editToggle');
+  const isOpen  = drawer.classList.contains('open');
+  drawer.classList.toggle('open');
+  toggle.classList.toggle('active');
+  if (!isOpen) syncInputsFromData();
+}
+
+function syncInputsFromData() {
+  document.getElementById('ei-price').value = DATA.purchasePrice || '';
+  document.getElementById('ei-down').value  = DATA.downPayment   || '';
+  document.getElementById('ei-tax').value   = DATA.taxMonthly    || '';
+  document.getElementById('ei-ins').value   = DATA.insMonthly    || '';
+  document.getElementById('ei-hoa').value   = DATA.hoaMonthly    || '';
+  document.getElementById('ei-rent').value  = DATA.rentMonthly   || '';
+  DATA.scenarios.forEach((s,i) => {
+    document.getElementById('ei-r'+i).value = s.rate || '';
+    document.getElementById('ei-p'+i).value = s.pts  || '';
+  });
+}
+
+function liveUpdate() {
+  const price = parseFloat(document.getElementById('ei-price').value) || DATA.purchasePrice;
+  const down  = parseFloat(document.getElementById('ei-down').value)  || DATA.downPayment;
+  DATA.purchasePrice = price;
+  DATA.downPayment   = down;
+  DATA.loanAmount    = price - down;
+  DATA.taxMonthly    = parseFloat(document.getElementById('ei-tax').value)  || 0;
+  DATA.insMonthly    = parseFloat(document.getElementById('ei-ins').value)  || 0;
+  DATA.hoaMonthly    = parseFloat(document.getElementById('ei-hoa').value)  || 0;
+  DATA.rentMonthly   = parseFloat(document.getElementById('ei-rent').value) || 0;
+  DATA.scenarios.forEach((s,i) => {
+    s.rate = parseFloat(document.getElementById('ei-r'+i).value) || 0;
+    s.pts  = parseFloat(document.getElementById('ei-p'+i).value) || 0;
+    s.ctc  = Math.round(down + (DATA.loanAmount * s.pts / 100) + (DATA.taxMonthly + DATA.insMonthly) * 2);
+  });
+  render();
+}
+
+/* ============================================================
+   SCENARIO HIGHLIGHT (click to feature during call)
+   ============================================================ */
+let activePick = null;
+function togglePick(idx) {
+  const cards = document.querySelectorAll('.sc');
+  if (activePick === idx) {
+    cards[idx].classList.remove('active-pick');
+    activePick = null;
+  } else {
+    if (activePick !== null) cards[activePick].classList.remove('active-pick');
+    cards[idx].classList.add('active-pick');
+    activePick = idx;
+  }
+}
+
+/* ============================================================
+   RENDER ENGINE — called on load and on every live update
+   ============================================================ */
+let ch1, ch2;
+
+function render() {
+  const d  = DATA;
+  const S  = buildScenarios(d);
+  const bl = S.find(s => s.ft) || S[2];
+  const loanAmt = d.loanAmount || (d.purchasePrice - d.downPayment);
+  const downPct = d.purchasePrice ? Math.round(d.downPayment / d.purchasePrice * 100) : 0;
+
+  // Header
+  document.getElementById('hSubtitle').textContent = d.borrowerName + ' · ' + d.subtitle;
+  document.getElementById('rTitle').textContent    = 'Loan Strategy — ' + d.borrowerName;
+  document.getElementById('recLabel').textContent  = d.recScenario;
+  document.getElementById('recBody').textContent   = d.recText;
+
+  // Report subtitle row
+  document.getElementById('rSub').innerHTML = `
+    <span><span class="dot"></span>${d.fileTypeLabel}</span>
+    <span><span class="dot"></span>${d.loanType}</span>
+    <span><span class="dot"></span>${d.reportDate}</span>
+    <span><span class="dot"></span>10-Year Horizon</span>`;
+
+  // KPI row
+  const kpis = [
+    { l:'Purchase price',   v: f(d.purchasePrice) },
+    { l:'Loan amount',      v: f(loanAmt),          s: downPct + '% down' },
+    { l:'Lowest PITIA',     v: f(S[3].pit) + '/mo', s: 'Wealth accelerator' },
+    ...(d.inv ? [
+      { l:'Expected rental',  v: f(d.rentMonthly) + '/mo', s: 'Gross monthly' },
+      { l:'Net carry',        v: f(bl.nc) + '/mo',         s: 'Balanced scenario' },
+    ] : [
+      { l:'Monthly payment',  v: f(bl.pit) + '/mo', s: 'Balanced scenario' },
+    ]),
+    { l:'Equity at 10 yrs', v: fk(bl.eq),           s: 'Balanced scenario' },
+  ];
+  document.getElementById('kg').innerHTML = kpis.map(k =>
+    `<div class="kc"><div class="kl">${k.l}</div><div class="kv">${k.v}</div>${k.s ? `<div class="ks">${k.s}</div>` : ''}</div>`
+  ).join('');
+
+  // Scenario cards
+  document.getElementById('sg').innerHTML = S.map((s,i) => `
+    <div class="sc${s.ft ? ' ft' : ''}" onclick="togglePick(${i})">
+      <div class="pick-indicator">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="sh">
+        <div class="sn">${s.label}</div>
+        ${s.ft ? '<div class="sb">Most balanced path</div>' : ''}
+      </div>
+      <div class="sm">
+        <div class="mr"><span class="ml2">Rate</span><span class="mv lg p">${s.rate.toFixed(3)}%</span></div>
+        <div class="mr"><span class="ml2">Points</span><span class="mv">${s.pts} (${f(loanAmt * s.pts / 100)})</span></div>
+        <div class="mr"><span class="ml2">P&I</span><span class="mv">${f(s.pi)}/mo</span></div>
+        <div class="mr"><span class="ml2">Total PITIA</span><span class="mv lg p">${f(s.pit)}/mo</span></div>
+        ${d.inv ? `<div class="mr"><span class="ml2">Net carry</span><span class="mv">${f(s.nc)}/mo</span></div>` : ''}
+        <div class="mr"><span class="ml2">Cash to close</span><span class="mv">${f(s.ctc)}</span></div>
+        <div class="mr"><span class="ml2">Equity at 10 yrs</span><span class="mv">${f(s.eq)}</span></div>
+      </div>
+    </div>`).join('');
+
+  // Re-apply active pick highlight after re-render
+  if (activePick !== null) {
+    const cards = document.querySelectorAll('.sc');
+    if (cards[activePick]) cards[activePick].classList.add('active-pick');
+  }
+
+  // Comparison table
+  const rows = [
+    ['Rate',                s => s.rate.toFixed(3) + '%'],
+    ['Points',              s => s.pts + ' (' + f(loanAmt * s.pts / 100) + ')'],
+    ['Monthly P&I',         s => f(s.pi),  true],
+    ['Monthly PITIA',       s => f(s.pit), true],
+    ...(d.inv ? [['Net carry vs rent', s => f(s.nc) + '/mo']] : []),
+    ['Cash to close',       s => f(s.ctc)],
+    ['10yr interest paid',  s => f(s.hi)],
+    ['10yr principal paid', s => f(s.hp)],
+    ['Remaining balance',   s => f(s.rb)],
+    ['Equity at 10 years',  s => f(s.eq)],
+  ];
+  document.getElementById('tbl').innerHTML =
+    `<thead><tr><th>Metric</th>${S.map(s=>`<th>${s.label}</th>`).join('')}</tr></thead><tbody>` +
+    rows.map(([l,fn,h]) =>
+      `<tr><td>${l}</td>${S.map(s=>`<td${h?' class="thl"':''}>${fn(s)}</td>`).join('')}</tr>`
+    ).join('') + '</tbody>';
+
+  // Equity bars
+  const mx = Math.max(...S.map(s => s.eq));
+  document.getElementById('eb').innerHTML = S.map((s,i) => {
+    const pct = mx > 0 ? (s.eq / mx * 100).toFixed(1) : 0;
+    return `<div class="er">
+      <div class="el">${s.label}</div>
+      <div class="et"><div class="ef" data-w="${pct}" style="width:0%;background:${CL[i]}"><span class="efl">${fk(s.eq)}</span></div></div>
+      <div class="ev">${f(s.eq)}</div>
+    </div>`;
+  }).join('');
+  setTimeout(() => document.querySelectorAll('.ef').forEach(e => e.style.width = e.dataset.w + '%'), 100);
+
+  // Charts
+  rebuildCharts(S);
+}
+
+function rebuildCharts(S) {
+  if (!S) S = buildScenarios(DATA);
+  if (ch1) ch1.destroy();
+  if (ch2) ch2.destroy();
+  const c  = gc();
+  const dk = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gr = dk ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const tk = dk ? '#797876' : '#7a7974';
+  const fn = { family: 'Inter', size: 11 };
+
+  ch1 = new Chart(document.getElementById('c1'), {
+    type: 'bar',
+    data: {
+      labels: S.map(s => s.label),
+      datasets: [{ data: S.map(s => s.pit), backgroundColor: c.map(x => x + 'cc'), borderColor: c, borderWidth: 2, borderRadius: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: x => ' $' + x.raw.toLocaleString() + '/mo' }}},
+      scales: {
+        y: { grid: { color: gr }, ticks: { color: tk, font: fn, callback: v => '$' + Math.round(v/1000) + 'K' }},
+        x: { grid: { display: false }, ticks: { color: tk, font: fn }}
+      }
+    }
+  });
+
+  const yr = ['Start','Yr 1','Yr 2','Yr 3','Yr 4','Yr 5','Yr 6','Yr 7','Yr 8','Yr 9','Yr 10'];
+  ch2 = new Chart(document.getElementById('c2'), {
+    type: 'line',
+    data: {
+      labels: yr,
+      datasets: S.map((s,i) => ({
+        label: s.label, data: s.cv, borderColor: c[i], backgroundColor: c[i] + '18',
+        borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5, tension: 0.3, fill: false
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: tk, font: fn, boxWidth: 12, padding: 10 }},
+        tooltip: { callbacks: { label: x => ' ' + x.dataset.label + ': $' + x.raw.toLocaleString() }}
+      },
+      scales: {
+        y: { grid: { color: gr }, ticks: { color: tk, font: fn, callback: v => '$' + Math.round(v/1000) + 'K' }},
+        x: { grid: { display: false }, ticks: { color: tk, font: fn }}
+      }
+    }
+  });
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
