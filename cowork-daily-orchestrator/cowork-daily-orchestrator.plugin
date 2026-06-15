@@ -1,0 +1,21 @@
+{
+  "plugin": {
+    "name": "cowork-daily-orchestrator",
+    "display_name": "🎯 Cowork Daily Orchestrator",
+    "version": "1.0.0",
+    "author": "Claude | MrMortgageMan™",
+    "description": "Surfaces four daily rituals: 6 AM SignalStrike queue, 8:30 AM pre-work ritual, 5 PM pre-leave ritual, 7 PM Sunday night ritual",
+    "status": "production",
+    "owner": "Scott W Thompson (66124405)",
+    "created": "2026-06-15",
+    "entry_point": "cowork_daily_orchestrator_FINAL.py",
+    "main_class": "CoworkDailyOrchestrator",
+    "modules": [
+      {"name": "SignalStrike Queue", "time": "6:00 AM", "frequency": "daily"},
+      {"name": "Pre-Work Ritual", "time": "8:30 AM", "frequency": "weekdays"},
+      {"name": "Pre-Leave Ritual", "time": "5:00 PM", "frequency": "weekdays"},
+      {"name": "Sunday Night Ritual", "time": "7:00 PM", "frequency": "Sundays"}
+    ],
+    "schema_decision": "Option A - Theme day filtered by [MON]/[TUE] prefix in hs_task_subject (locked 2026-06-15)"
+  }
+}
