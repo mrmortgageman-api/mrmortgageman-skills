@@ -1,6 +1,6 @@
 ---
 name: newsletter-studio
-description: "Runs the governed #IGot5OnIt newsletter workflow from the existing Notion Newsletter Studio home and Google Drive Library. Does not replace Newsletter Studio or create new doctrine. Requires the Weekly Intelligence Packet before any draft, applies the payment translation patch, and requires Griff QA before Scott approval."
+description: "Runs the governed #IGot5OnIt newsletter workflow from the existing Notion Newsletter Studio home and Google Drive Library. Does not replace Newsletter Studio or create new doctrine. Requires the Weekly Intelligence Packet before any draft, applies the payment translation patch, requires Griff QA before Scott approval, and supports production baton mode for time-constrained Sunday execution."
 ---
 
 # Skill: newsletter-studio
@@ -18,6 +18,31 @@ This skill is a thin operating wrapper. The Notion Newsletter Studio home and th
 - "build the intelligence packet"
 - "what template this week"
 - "prep Monday's newsletter"
+- "Sunday production mode"
+- "I need a 90% draft"
+- "I need Mailchimp-ready HTML"
+
+## Production Baton Mode
+
+Use this mode when Scott is time-constrained, traveling, or explicitly says he cannot argue with the AI.
+
+The operator taking the baton must return usable work, not questions, excuses, or partial process notes. The output must be at least 90% ready for Scott to review.
+
+Required deliverables in Production Baton Mode:
+
+1. Creative brief with the recommended angle
+2. Two or three viable theme/title options
+3. Weekly Intelligence Packet summary
+4. Recommended template selection
+5. Full newsletter draft in Scott's voice
+6. Payment translation using the approved conforming-only rule
+7. Play of the Week
+8. Subject line A and B, with preview text
+9. Griff QA checklist
+10. Mailchimp-ready HTML using the selected template
+11. Short notes on what needs Scott's final call
+
+Do not stop at research. Do not stop at the packet. Do not hand Scott a checklist unless he specifically asks for only a checklist. If the source scan is incomplete, make the best supportable draft from available evidence and clearly label any weak spots.
 
 ## Step 1 — Load the Operating Home
 
@@ -68,7 +93,14 @@ Select from the Play Name Bank. Never repeat a play name within the same calenda
 
 ## Step 6 — Hand Off to Draft Lane
 
-Once the packet, template, and play are locked, hand off to drafting using the Master Guide's output structure and the Voice Guide. Mailchimp is distribution only — it is never the source of truth for content or data.
+Once the packet, template, and play are locked, draft using the Master Guide's output structure and the Voice Guide. Mailchimp is distribution only — it is never the source of truth for content or data.
+
+The draft lane must produce both:
+
+1. A readable editorial draft Scott can review for story and voice
+2. Mailchimp-ready HTML using the selected active template
+
+The HTML must be easy for Scott to copy into Mailchimp so he can preview, read, think, and give feedback without rebuilding the issue manually.
 
 ## Step 7 — QA and Approval Order
 
@@ -85,8 +117,9 @@ Capture lessons learned and performance signal back into the Newsletter Performa
 
 - No new doctrine gets created by this skill. If a gap shows up, flag it — don't patch it here.
 - No Drive files get duplicated into GitHub. This skill points at them; it doesn't copy them.
-- No draft starts before the Weekly Intelligence Packet is complete.
+- No draft starts before the Weekly Intelligence Packet is complete unless Scott explicitly orders emergency best-effort drafting.
 - No jumbo payment ever gets quoted at a conforming rate.
+- No production baton handoff may end with "I was waiting," "I could not proceed," or process-only notes when a best-effort draft could have been created.
 
 ## Final Rule
 
