@@ -66,7 +66,26 @@ Do not draft the newsletter until the packet is complete. The packet must answer
 
 Pull from the five-signal source framework (rate direction, buyer demand, inventory and pricing, affordability and access, agent strategy) independently. Do not hand this list back to Scott as a checklist — go get the data.
 
-## Step 3 — Template Selection
+## Step 3 — Rate Source and Payment Math
+
+For mortgage-rate inputs, use Mortgage News Daily's mortgage rates page unless Scott explicitly names a different source for that issue:
+
+https://www.mortgagenewsdaily.com/mortgage-rates
+
+The operator owns the rate pull. Scott does not manually confirm rates as a required production step.
+
+For every rate-based payment example, record:
+
+1. Source used
+2. Pull date and time
+3. Rate numbers used
+4. Loan amount used
+5. Principal and interest calculation
+6. Any assumption or weak spot
+
+Use the conforming-only payment rule in Step 6. If the rate source is unavailable, use the best available approved fallback, label it clearly as a production assumption, and do not stop the draft.
+
+## Step 4 — Template Selection
 
 Pick before writing:
 
@@ -77,7 +96,7 @@ Pick before writing:
 
 T2 beats T3 in the same week. T4 overrides all. Never mix event blocks.
 
-## Step 4 — Agent Play (Play of the Week)
+## Step 5 — Agent Play (Play of the Week)
 
 Select from the Play Name Bank. Never repeat a play name within the same calendar year.
 
@@ -85,15 +104,15 @@ Select from the Play Name Bank. Never repeat a play name within the same calenda
 - Names the move, not the outcome
 - Real scenario underneath, anonymized
 
-## Step 5 — Payment Translation Patch
+## Step 6 — Payment Translation Patch
 
 - Conforming payment examples only
 - Never quote jumbo payments using conforming pricing
 - For jumbo scenarios, route the agent to Scott for a custom quote
 
-## Step 6 — Hand Off to Draft Lane
+## Step 7 — Hand Off to Draft Lane
 
-Once the packet, template, and play are locked, draft using the Master Guide's output structure and the Voice Guide. Mailchimp is distribution only — it is never the source of truth for content or data.
+Once the packet, template, rate inputs, payment math, and play are locked, draft using the Master Guide's output structure and the Voice Guide. Mailchimp is distribution only — it is never the source of truth for content or data.
 
 The draft lane must produce both:
 
@@ -102,14 +121,14 @@ The draft lane must produce both:
 
 The HTML must be easy for Scott to copy into Mailchimp so he can preview, read, think, and give feedback without rebuilding the issue manually.
 
-## Step 7 — QA and Approval Order
+## Step 8 — QA and Approval Order
 
 1. Griff QA
 2. Scott approval (Scott is Editor-in-Chief — final call always his)
 
 Nothing sends without both, in that order.
 
-## Step 8 — After Send
+## Step 9 — After Send
 
 Capture lessons learned and performance signal back into the Newsletter Performance Hub (Decision Log / Weekly Audit Log) so the next packet starts smarter than the last.
 
@@ -120,6 +139,7 @@ Capture lessons learned and performance signal back into the Newsletter Performa
 - No draft starts before the Weekly Intelligence Packet is complete unless Scott explicitly orders emergency best-effort drafting.
 - No jumbo payment ever gets quoted at a conforming rate.
 - No production baton handoff may end with "I was waiting," "I could not proceed," or process-only notes when a best-effort draft could have been created.
+- Scott is not the manual rate checker. The operator pulls rates from the approved rate source and shows Scott the source, timestamp, and math.
 
 ## Final Rule
 
