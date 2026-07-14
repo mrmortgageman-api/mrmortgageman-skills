@@ -649,7 +649,7 @@ function render() {
     ] : [
       { l:'Monthly payment',  v: f(featured.pit) + '/mo',  s: featured.label + ' scenario' },
     ]),
-    { l:'Equity at 10 yrs', v: fk(featured.eq),            s: featured.label + ' scenario' },
+    { l:'Est. Equity at 10 yrs', v: fk(featured.eq),        s: featured.label + ' scenario' },
   ];
   document.getElementById('kg').innerHTML = kpis.map(k =>
     `<div class="kc"><div class="kl">${k.l}</div><div class="kv">${k.v}</div>${k.s ? `<div class="ks">${k.s}</div>` : ''}</div>`
@@ -685,7 +685,7 @@ function render() {
         ${d.inv ? `<div class="mr"><span class="ml2">Net carry</span><span class="mv">${f(s.nc)}/mo</span></div>` : ''}
         <div class="mr"><span class="ml2">Cash to close</span><span class="mv">${f(s.ctc)}</span></div>
         <div class="mr"><span class="ml2">Total interest (${s.term}yr)</span><span class="mv">${f(s.totalInterest)}</span></div>
-        <div class="mr"><span class="ml2">Equity at 10 yrs</span><span class="mv">${f(s.eq)}</span></div>
+        <div class="mr"><span class="ml2">Est. Equity at 10 yrs</span><span class="mv">${f(s.eq)}</span></div>
         <div class="mr"><span class="ml2">Payoff date</span><span class="mv">${s.payoffDate}</span></div>
       </div>
     </div>`;
@@ -712,7 +712,7 @@ function render() {
     ['Remaining balance (10yr)',   s => f(s.rb)],
     ['Total interest (full term)', s => f(s.totalInterest)],
     ['Payoff date',                s => s.payoffDate],
-    ['Equity at 10 years',         s => f(s.eq)],
+    ['Est. Equity at 10 years',    s => f(s.eq)],
   ];
   document.getElementById('tbl').innerHTML =
     `<thead><tr><th>Metric</th>${S.map(s=>`<th>${s.label}</th>`).join('')}</tr></thead><tbody>` +
