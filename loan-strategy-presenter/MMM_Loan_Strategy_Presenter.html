@@ -96,7 +96,8 @@ input{font:inherit}
 .sc-product-type{font-size:.68rem;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
 .sc-product-terms{font-size:.72rem;color:var(--txt);margin-top:2px}
 .sh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.sn{font-family:'Instrument Serif',Georgia,serif;font-size:1.05rem;font-style:italic;color:var(--txt);transition:color .2s}
+.sn{font-family:'Instrument Serif',Georgia,serif;font-size:1.05rem;font-style:italic;color:var(--txt);transition:color .2s;display:flex;align-items:center;gap:6px}
+.sn .si-svg{flex-shrink:0}
 .sb{font-size:.62rem;padding:2px 7px;border-radius:50px;background:var(--prih);color:var(--pri);font-weight:600;white-space:nowrap}
 .sc-why{font-size:.72rem;color:var(--mut);line-height:1.4;margin-bottom:12px;font-style:italic}
 .sm{display:grid;gap:7px}
@@ -335,44 +336,63 @@ const DATA = {
   recScenario:   "[RECOMMENDATION_SCENARIO]",
   recText:       "[RECOMMENDATION_TEXT]",
   // 1 to 4 entries, fixed label order when multiple are present:
-  // Current Loan, Conservative, Balanced, Wealth Accelerator
+  // Today's Rate, Fastest Payoff, Best Monthly Value, Maximum Savings
   scenarios: [
-    { label:"Current Loan",       loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
-    { label:"Conservative",       loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
-    { label:"Balanced",           loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:true  },
-    { label:"Wealth Accelerator", loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
+    { label:"Today's Rate",       loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
+    { label:"Fastest Payoff",     loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
+    { label:"Best Monthly Value", loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:true  },
+    { label:"Maximum Savings",    loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
   ]
 };
 
 /* ============================================================
-   LOCKED LABEL SET, WHY SENTENCES, SCENARIO COLORS
+   LOCKED LABEL SET, WHY SENTENCES, SCENARIO COLORS, STRATEGY ICONS
    Doctrine: APEX_DESIGN_DISCOVERY_StrategyNamesAreNotLoanProducts_2026-06-18
-   Keyed by label identity, never by array position — a lone Conservative
+   Amended 2026-07-14 (Notion, locked): philosophy-named labels replaced with
+   outcome-based labels — they still required explanation on a live call,
+   which is exactly the friction the four-layer doctrine was meant to remove.
+   Keyed by label identity, never by array position — a lone Fastest Payoff
    card must still render in teal, not default to navy because it's scenarios[0].
    Do not change this wording or these hex values.
    ============================================================ */
-const SCENARIO_LABELS = ["Current Loan", "Conservative", "Balanced", "Wealth Accelerator"];
+const SCENARIO_LABELS = ["Today's Rate", "Fastest Payoff", "Best Monthly Value", "Maximum Savings"];
 
 const WHY_SENTENCES = {
-  "Current Loan":       "Preserves maximum monthly cash flow.",
-  "Conservative":       "Lowest risk. Highest certainty. Fastest payoff.",
-  "Balanced":           "Balances monthly payment and long-term wealth creation.",
-  "Wealth Accelerator": "Maximizes equity and minimizes total interest paid.",
+  "Today's Rate":       "Your baseline, priced at today's market rate with no added cost.",
+  "Fastest Payoff":     "Pays off years sooner and saves the most in total interest.",
+  "Best Monthly Value": "The strongest trade between upfront cost and monthly savings.",
+  "Maximum Savings":    "Biggest upfront investment for the lowest possible payment and long-term interest.",
 };
 
 const SCENARIO_COLORS_LIGHT = {
-  "Current Loan":       "#1e3a5f",
-  "Conservative":       "#01696f",
-  "Balanced":           "#437a22",
-  "Wealth Accelerator": "#d19900",
+  "Today's Rate":       "#1e3a5f",
+  "Fastest Payoff":     "#01696f",
+  "Best Monthly Value": "#437a22",
+  "Maximum Savings":    "#d19900",
 };
 
 const SCENARIO_COLORS_DARK = {
-  "Current Loan":       "#5591c7",
-  "Conservative":       "#4f98a3",
-  "Balanced":           "#6daa45",
-  "Wealth Accelerator": "#e8af34",
+  "Today's Rate":       "#5591c7",
+  "Fastest Payoff":     "#4f98a3",
+  "Best Monthly Value": "#6daa45",
+  "Maximum Savings":    "#e8af34",
 };
+
+// Single-color monoline paths, viewBox 0 0 24 24 — matches the stroke-based
+// icon system already used elsewhere in this file (dark mode toggle, print,
+// pick-indicator checkmark). Keyed by label identity, same as color/why-text.
+const STRATEGY_ICON_PATHS = {
+  "Today's Rate":       '<line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  "Fastest Payoff":     '<polyline points="5 4 13 12 5 20"/><polyline points="13 4 21 12 13 20"/>',
+  "Best Monthly Value": '<line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="21" x2="19" y2="21"/><line x1="4" y1="7" x2="20" y2="7"/><path d="M4 7l-2.5 5a3 3 0 0 0 6.2 0z"/><path d="M20 7l-2.5 5a3 3 0 0 0 6.2 0z"/>',
+  "Maximum Savings":    '<polyline points="3 17 9 11 13 15 21 5"/><polyline points="15 5 21 5 21 11"/>',
+};
+
+function strategyIcon(label) {
+  const inner = STRATEGY_ICON_PATHS[label];
+  if (!inner) return '';
+  return `<svg class="si-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${colorFor(label)}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+}
 
 /* ============================================================
    VALIDATION — this renders live on a screen share.
@@ -600,7 +620,7 @@ function render() {
   }
 
   const S = buildScenarios(d);
-  const featured = S.find(s => s.featured) || S.find(s => s.label === 'Balanced') || S[0];
+  const featured = S.find(s => s.featured) || S.find(s => s.label === 'Best Monthly Value') || S[0];
   const loanAmt  = d.loanAmount || (d.purchasePrice - d.downPayment);
   const downPct  = d.purchasePrice ? Math.round(d.downPayment / d.purchasePrice * 100) : 0;
 
@@ -643,7 +663,7 @@ function render() {
     const isFeatured = s.label === featured.label;
     let badgeText = '';
     if (isFeatured) {
-      badgeText = S.length === 1 ? 'Your scenario' : (s.label === 'Balanced' ? 'Most balanced path' : "Scott's pick");
+      badgeText = S.length === 1 ? 'Your scenario' : "Scott's pick";
     }
     return `
     <div class="sc${isFeatured ? ' ft' : ''}" onclick="togglePick(${i})">
@@ -655,7 +675,7 @@ function render() {
         <div class="sc-product-terms">${s.rate.toFixed(3)}% · ${s.term}yr · ${s.pts} pts · ${dPct}% down</div>
       </div>
       <div class="sh">
-        <div class="sn">${s.label}</div>
+        <div class="sn">${strategyIcon(s.label)}${s.label}</div>
         ${badgeText ? `<div class="sb">${badgeText}</div>` : ''}
       </div>
       <div class="sc-why">${WHY_SENTENCES[s.label]}</div>
