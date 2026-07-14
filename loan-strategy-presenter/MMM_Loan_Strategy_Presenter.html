@@ -52,7 +52,7 @@ input{font:inherit}
 .edit-input{padding:7px 10px;border:1px solid var(--bdr);border-radius:6px;background:var(--bg);color:var(--txt);font-size:.82rem;transition:border-color .15s}
 .edit-input:focus{outline:none;border-color:var(--pri)}
 .edit-section-label{font-size:.65rem;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:4px}
-.scenario-inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.scenario-inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .scenario-input-group{background:var(--soff);border-radius:8px;padding:10px}
 .scenario-input-label{font-size:.68rem;font-weight:600;color:var(--txt);margin-bottom:8px;font-family:'Instrument Serif',Georgia,serif;font-style:italic}
 .edit-recalc{display:inline-flex;align-items:center;gap:6px;background:var(--pri);color:#fff;font-size:.78rem;font-weight:600;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;transition:opacity .15s;margin-top:4px}
@@ -82,6 +82,7 @@ input{font:inherit}
 
 /* Scenario grid */
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:12px;margin-bottom:22px}
+.sg.sg-solo{grid-template-columns:minmax(225px,340px);justify-content:center}
 .sc{background:var(--surf);border:1.5px solid rgba(0,0,0,.07);border-radius:14px;padding:17px;transition:all .2s;cursor:pointer;position:relative}
 [data-theme=dark] .sc{border-color:rgba(255,255,255,.06)}
 .sc:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:var(--pri);transform:translateY(-1px)}
@@ -91,9 +92,14 @@ input{font:inherit}
 .pick-indicator{display:none;position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--green);align-items:center;justify-content:center}
 .sc.active-pick .pick-indicator{display:flex}
 .pick-hint{font-size:.62rem;color:var(--mut);margin-bottom:8px;text-align:center}
-.sh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.sn{font-family:'Instrument Serif',Georgia,serif;font-size:1.05rem;font-style:italic;color:var(--txt);transition:color .2s}
+.sc-product{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--div)}
+.sc-product-type{font-size:.68rem;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.sc-product-terms{font-size:.72rem;color:var(--txt);margin-top:2px}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.sn{font-family:'Instrument Serif',Georgia,serif;font-size:1.05rem;font-style:italic;color:var(--txt);transition:color .2s;display:flex;align-items:center;gap:6px}
+.sn .si-svg{flex-shrink:0}
 .sb{font-size:.62rem;padding:2px 7px;border-radius:50px;background:var(--prih);color:var(--pri);font-weight:600;white-space:nowrap}
+.sc-why{font-size:.72rem;color:var(--mut);line-height:1.4;margin-bottom:12px;font-style:italic}
 .sm{display:grid;gap:7px}
 .mr{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:7px;border-bottom:1px solid var(--div)}
 .mr:last-child{border-bottom:none;padding-bottom:0}
@@ -230,53 +236,8 @@ tr:hover td{background:var(--soff)}
         <input class="edit-input" id="ei-rent" type="number" step="100" oninput="liveUpdate()">
       </div>
     </div>
-    <div class="edit-section-label">Scenario rates & points</div>
-    <div class="scenario-inputs">
-      <div class="scenario-input-group">
-        <div class="scenario-input-label">Current loan</div>
-        <div class="edit-field" style="margin-bottom:6px">
-          <label class="edit-label">Rate (%)</label>
-          <input class="edit-input" id="ei-r0" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-        <div class="edit-field">
-          <label class="edit-label">Points</label>
-          <input class="edit-input" id="ei-p0" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-      </div>
-      <div class="scenario-input-group">
-        <div class="scenario-input-label">Conservative</div>
-        <div class="edit-field" style="margin-bottom:6px">
-          <label class="edit-label">Rate (%)</label>
-          <input class="edit-input" id="ei-r1" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-        <div class="edit-field">
-          <label class="edit-label">Points</label>
-          <input class="edit-input" id="ei-p1" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-      </div>
-      <div class="scenario-input-group">
-        <div class="scenario-input-label">Balanced</div>
-        <div class="edit-field" style="margin-bottom:6px">
-          <label class="edit-label">Rate (%)</label>
-          <input class="edit-input" id="ei-r2" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-        <div class="edit-field">
-          <label class="edit-label">Points</label>
-          <input class="edit-input" id="ei-p2" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-      </div>
-      <div class="scenario-input-group">
-        <div class="scenario-input-label">Wealth accelerator</div>
-        <div class="edit-field" style="margin-bottom:6px">
-          <label class="edit-label">Rate (%)</label>
-          <input class="edit-input" id="ei-r3" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-        <div class="edit-field">
-          <label class="edit-label">Points</label>
-          <input class="edit-input" id="ei-p3" type="number" step="0.125" oninput="liveUpdate()">
-        </div>
-      </div>
-    </div>
+    <div class="edit-section-label">Scenario product & pricing</div>
+    <div class="scenario-inputs" id="scenarioInputsContainer"></div>
     <div class="edit-note">All fields update the presentation in real time. No reload needed. Toggle off to hide this panel during screen share.</div>
   </div>
 </div>
@@ -362,24 +323,104 @@ const DATA = {
   borrowerName:  "[BORROWER_NAME]",
   subtitle:      "[FILE_SUBTITLE]",
   reportDate:    "[REPORT_DATE]",
+  closingDate:   "",
   fileTypeLabel: "[FILE_TYPE_LABEL]",
-  loanType:      "[LOAN_TYPE]",
   inv:           false,
   purchasePrice: 0,
   downPayment:   0,
+  loanAmount:    0,
   taxMonthly:    0,
   insMonthly:    0,
   hoaMonthly:    0,
   rentMonthly:   0,
   recScenario:   "[RECOMMENDATION_SCENARIO]",
   recText:       "[RECOMMENDATION_TEXT]",
+  // 1 to 4 entries, fixed label order when multiple are present:
+  // Today's Rate, Fastest Payoff, Best Monthly Value, Maximum Savings
   scenarios: [
-    { label:"Current loan",       rate:0, pts:0, ctc:0 },
-    { label:"Conservative",       rate:0, pts:0, ctc:0 },
-    { label:"Balanced",           rate:0, pts:0, ctc:0, ft:true },
-    { label:"Wealth accelerator", rate:0, pts:0, ctc:0 },
+    { label:"Today's Rate",       loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
+    { label:"Fastest Payoff",     loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
+    { label:"Best Monthly Value", loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:true  },
+    { label:"Maximum Savings",    loanType:"30-Year Conventional Fixed", termYears:30, rate:0, pts:0, loanAmount:0, downPayment:0, featured:false },
   ]
 };
+
+/* ============================================================
+   LOCKED LABEL SET, WHY SENTENCES, SCENARIO COLORS, STRATEGY ICONS
+   Doctrine: APEX_DESIGN_DISCOVERY_StrategyNamesAreNotLoanProducts_2026-06-18
+   Amended 2026-07-14 (Notion, locked): philosophy-named labels replaced with
+   outcome-based labels — they still required explanation on a live call,
+   which is exactly the friction the four-layer doctrine was meant to remove.
+   Keyed by label identity, never by array position — a lone Fastest Payoff
+   card must still render in teal, not default to navy because it's scenarios[0].
+   Do not change this wording or these hex values.
+   ============================================================ */
+const SCENARIO_LABELS = ["Today's Rate", "Fastest Payoff", "Best Monthly Value", "Maximum Savings"];
+
+const WHY_SENTENCES = {
+  "Today's Rate":       "Your baseline, priced at today's market rate with no added cost.",
+  "Fastest Payoff":     "Pays off years sooner and saves the most in total interest.",
+  "Best Monthly Value": "The strongest trade between upfront cost and monthly savings.",
+  "Maximum Savings":    "Biggest upfront investment for the lowest possible payment and long-term interest.",
+};
+
+const SCENARIO_COLORS_LIGHT = {
+  "Today's Rate":       "#1e3a5f",
+  "Fastest Payoff":     "#01696f",
+  "Best Monthly Value": "#437a22",
+  "Maximum Savings":    "#d19900",
+};
+
+const SCENARIO_COLORS_DARK = {
+  "Today's Rate":       "#5591c7",
+  "Fastest Payoff":     "#4f98a3",
+  "Best Monthly Value": "#6daa45",
+  "Maximum Savings":    "#e8af34",
+};
+
+// Single-color monoline paths, viewBox 0 0 24 24 — matches the stroke-based
+// icon system already used elsewhere in this file (dark mode toggle, print,
+// pick-indicator checkmark). Keyed by label identity, same as color/why-text.
+const STRATEGY_ICON_PATHS = {
+  "Today's Rate":       '<line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  "Fastest Payoff":     '<polyline points="5 4 13 12 5 20"/><polyline points="13 4 21 12 13 20"/>',
+  "Best Monthly Value": '<line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="21" x2="19" y2="21"/><line x1="4" y1="7" x2="20" y2="7"/><path d="M4 7l-2.5 5a3 3 0 0 0 6.2 0z"/><path d="M20 7l-2.5 5a3 3 0 0 0 6.2 0z"/>',
+  "Maximum Savings":    '<polyline points="3 17 9 11 13 15 21 5"/><polyline points="15 5 21 5 21 11"/>',
+};
+
+function strategyIcon(label) {
+  const inner = STRATEGY_ICON_PATHS[label];
+  if (!inner) return '';
+  return `<svg class="si-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${colorFor(label)}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+}
+
+/* ============================================================
+   VALIDATION — this renders live on a screen share.
+   Fail loud and visible, never silently.
+   ============================================================ */
+function validateData(d) {
+  const errs = [];
+  if (!Array.isArray(d.scenarios) || d.scenarios.length < 1 || d.scenarios.length > 4) {
+    errs.push(`DATA.scenarios must contain 1-4 entries (found ${d.scenarios ? d.scenarios.length : 0}).`);
+  } else {
+    d.scenarios.forEach((s, i) => {
+      if (!SCENARIO_LABELS.includes(s.label)) {
+        errs.push(`Scenario ${i} has label "${s.label}", which is not in the locked set: ${SCENARIO_LABELS.join(', ')}.`);
+      }
+    });
+  }
+  return errs;
+}
+
+function renderError(errs) {
+  document.querySelector('.wrap').innerHTML = `
+    <div style="max-width:640px;margin:60px auto;padding:24px;border:2px solid #c0392b;border-radius:14px;background:var(--surf)">
+      <div style="font-weight:700;color:#c0392b;margin-bottom:10px;font-size:.95rem">Configuration error — presentation not rendered</div>
+      <ul style="font-size:.8rem;color:var(--txt);line-height:1.7;padding-left:18px;margin:0">
+        ${errs.map(e => `<li>${e}</li>`).join('')}
+      </ul>
+    </div>`;
+}
 
 /* ============================================================
    MATH ENGINE
@@ -390,41 +431,67 @@ function calcPI(loan, rate, years) {
   return loan * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n)-1);
 }
 
-function buildCurve(loan, rate) {
+function buildCurve(loan, rate, years) {
   if (!loan || !rate) return Array(11).fill(0);
-  const r = rate / 1200, pmt = calcPI(loan, rate, 30);
+  const r = rate / 1200, pmt = calcPI(loan, rate, years);
   let b = loan;
   const pts = [Math.round(b)];
-  for (let m = 1; m <= 120; m++) {
+  const horizonMonths = Math.min(120, years * 12);
+  for (let m = 1; m <= horizonMonths; m++) {
     b -= (pmt - b * r);
-    if (m % 12 === 0) pts.push(Math.round(b));
+    if (m % 12 === 0) pts.push(Math.round(Math.max(b, 0)));
   }
+  while (pts.length < 11) pts.push(0);
   return pts;
+}
+
+function formatPayoffDate(baseDateStr, termYears) {
+  let base = baseDateStr ? new Date(baseDateStr) : new Date();
+  if (isNaN(base.getTime())) base = new Date();
+  const payoff = new Date(base.getFullYear() + termYears, base.getMonth(), 1);
+  return payoff.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
 function buildScenarios(d) {
   const fixed = d.taxMonthly + d.insMonthly + d.hoaMonthly;
+  const baseLoanAmount = d.loanAmount || (d.purchasePrice - d.downPayment);
   return d.scenarios.map(s => {
-    const p   = calcPI(d.loanAmount || (d.purchasePrice - d.downPayment), s.rate, 30);
-    const pit = p + fixed;
-    const r   = s.rate / 1200;
-    let b = d.loanAmount || (d.purchasePrice - d.downPayment);
-    let ti = 0, tp = 0;
-    for (let m = 1; m <= 120; m++) {
+    const loanAmount  = s.loanAmount  || baseLoanAmount;
+    const downPayment = s.downPayment || d.downPayment;
+    const term = s.termYears || 30;
+    const p    = calcPI(loanAmount, s.rate, term);
+    const pit  = p + fixed;
+    const r    = s.rate / 1200;
+
+    // 10-year snapshot — fixed comparison horizon regardless of term
+    let b = loanAmount, hi = 0, hp = 0;
+    const snapMonths = Math.min(120, term * 12);
+    for (let m = 1; m <= snapMonths; m++) {
       const interest  = b * r;
       const principal = p - interest;
-      ti += interest; tp += principal; b -= principal;
+      hi += interest; hp += principal; b -= principal;
     }
+    b = Math.max(b, 0);
+
+    // Full-term total interest — distinct from the 10yr snapshot above
+    const totalInterest = p ? Math.round(p * term * 12 - loanAmount) : 0;
+
     return {
       ...s,
+      loanAmount:  Math.round(loanAmount),
+      downPayment: Math.round(downPayment),
+      term,
       pi:  Math.round(p),
       pit: Math.round(pit),
-      hi:  Math.round(ti),
-      hp:  Math.round(tp),
+      hi:  Math.round(hi),
+      hp:  Math.round(hp),
       rb:  Math.round(b),
-      eq:  Math.round(d.downPayment + tp),
+      eq:  Math.round(downPayment + hp),
       nc:  Math.round(d.rentMonthly - pit),
-      cv:  buildCurve(d.loanAmount || (d.purchasePrice - d.downPayment), s.rate)
+      ctc: Math.round(downPayment + (loanAmount * s.pts / 100) + (d.taxMonthly + d.insMonthly) * 2),
+      totalInterest,
+      payoffDate: formatPayoffDate(d.closingDate || d.reportDate, term),
+      cv:  buildCurve(loanAmount, s.rate, term)
     };
   });
 }
@@ -434,9 +501,8 @@ function buildScenarios(d) {
    ============================================================ */
 const f  = n => '$' + Math.round(n).toLocaleString();
 const fk = n => '$' + Math.round(n/1000) + 'K';
-const CL = ['#1e3a5f','#01696f','#437a22','#d19900'];
-const CD = ['#5591c7','#4f98a3','#6daa45','#e8af34'];
-const gc = () => document.documentElement.getAttribute('data-theme') === 'dark' ? CD : CL;
+const gc = () => document.documentElement.getAttribute('data-theme') === 'dark' ? SCENARIO_COLORS_DARK : SCENARIO_COLORS_LIGHT;
+const colorFor = label => gc()[label] || '#7a7974';
 
 /* ============================================================
    DARK MODE
@@ -475,26 +541,50 @@ function syncInputsFromData() {
   document.getElementById('ei-ins').value   = DATA.insMonthly    || '';
   document.getElementById('ei-hoa').value   = DATA.hoaMonthly    || '';
   document.getElementById('ei-rent').value  = DATA.rentMonthly   || '';
-  DATA.scenarios.forEach((s,i) => {
-    document.getElementById('ei-r'+i).value = s.rate || '';
-    document.getElementById('ei-p'+i).value = s.pts  || '';
-  });
+  renderScenarioInputs();
+}
+
+function renderScenarioInputs() {
+  const container = document.getElementById('scenarioInputsContainer');
+  container.innerHTML = DATA.scenarios.map((s, i) => `
+    <div class="scenario-input-group">
+      <div class="scenario-input-label">${s.label}</div>
+      <div class="edit-field" style="margin-bottom:6px">
+        <label class="edit-label">Loan type</label>
+        <input class="edit-input" id="ei-type${i}" value="${s.loanType || ''}" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field" style="margin-bottom:6px">
+        <label class="edit-label">Term (yrs)</label>
+        <input class="edit-input" id="ei-term${i}" type="number" value="${s.termYears || 30}" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field" style="margin-bottom:6px">
+        <label class="edit-label">Rate (%)</label>
+        <input class="edit-input" id="ei-r${i}" type="number" step="0.125" value="${s.rate || ''}" oninput="liveUpdate()">
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Points</label>
+        <input class="edit-input" id="ei-p${i}" type="number" step="0.125" value="${s.pts || ''}" oninput="liveUpdate()">
+      </div>
+    </div>`).join('');
 }
 
 function liveUpdate() {
-  const price = parseFloat(document.getElementById('ei-price').value) || DATA.purchasePrice;
-  const down  = parseFloat(document.getElementById('ei-down').value)  || DATA.downPayment;
-  DATA.purchasePrice = price;
-  DATA.downPayment   = down;
-  DATA.loanAmount    = price - down;
+  DATA.purchasePrice = parseFloat(document.getElementById('ei-price').value) || 0;
+  DATA.downPayment   = parseFloat(document.getElementById('ei-down').value)  || 0;
+  DATA.loanAmount    = DATA.purchasePrice - DATA.downPayment;
   DATA.taxMonthly    = parseFloat(document.getElementById('ei-tax').value)  || 0;
   DATA.insMonthly    = parseFloat(document.getElementById('ei-ins').value)  || 0;
   DATA.hoaMonthly    = parseFloat(document.getElementById('ei-hoa').value)  || 0;
   DATA.rentMonthly   = parseFloat(document.getElementById('ei-rent').value) || 0;
-  DATA.scenarios.forEach((s,i) => {
-    s.rate = parseFloat(document.getElementById('ei-r'+i).value) || 0;
-    s.pts  = parseFloat(document.getElementById('ei-p'+i).value) || 0;
-    s.ctc  = Math.round(down + (DATA.loanAmount * s.pts / 100) + (DATA.taxMonthly + DATA.insMonthly) * 2);
+  DATA.scenarios.forEach((s, i) => {
+    const typeEl = document.getElementById('ei-type' + i);
+    const termEl = document.getElementById('ei-term' + i);
+    const rEl    = document.getElementById('ei-r' + i);
+    const pEl    = document.getElementById('ei-p' + i);
+    if (typeEl) s.loanType  = typeEl.value || s.loanType;
+    if (termEl) s.termYears = parseFloat(termEl.value) || s.termYears || 30;
+    if (rEl)    s.rate = parseFloat(rEl.value) || 0;
+    if (pEl)    s.pts  = parseFloat(pEl.value) || 0;
   });
   render();
 }
@@ -521,11 +611,18 @@ function togglePick(idx) {
 let ch1, ch2;
 
 function render() {
-  const d  = DATA;
-  const S  = buildScenarios(d);
-  const bl = S.find(s => s.ft) || S[2];
-  const loanAmt = d.loanAmount || (d.purchasePrice - d.downPayment);
-  const downPct = d.purchasePrice ? Math.round(d.downPayment / d.purchasePrice * 100) : 0;
+  const d = DATA;
+  const errs = validateData(d);
+  if (errs.length) {
+    errs.forEach(e => console.error('[TCA Presenter] ' + e));
+    renderError(errs);
+    return;
+  }
+
+  const S = buildScenarios(d);
+  const featured = S.find(s => s.featured) || S.find(s => s.label === 'Best Monthly Value') || S[0];
+  const loanAmt  = d.loanAmount || (d.purchasePrice - d.downPayment);
+  const downPct  = d.purchasePrice ? Math.round(d.downPayment / d.purchasePrice * 100) : 0;
 
   // Header
   document.getElementById('hSubtitle').textContent = d.borrowerName + ' · ' + d.subtitle;
@@ -536,47 +633,63 @@ function render() {
   // Report subtitle row
   document.getElementById('rSub').innerHTML = `
     <span><span class="dot"></span>${d.fileTypeLabel}</span>
-    <span><span class="dot"></span>${d.loanType}</span>
+    <span><span class="dot"></span>${S.length} Scenario${S.length > 1 ? 's' : ''} Modeled</span>
     <span><span class="dot"></span>${d.reportDate}</span>
     <span><span class="dot"></span>10-Year Horizon</span>`;
 
   // KPI row
+  const lowestPitia = S.reduce((min, s) => s.pit < min.pit ? s : min, S[0]);
   const kpis = [
     { l:'Purchase price',   v: f(d.purchasePrice) },
-    { l:'Loan amount',      v: f(loanAmt),          s: downPct + '% down' },
-    { l:'Lowest PITIA',     v: f(S[3].pit) + '/mo', s: 'Wealth accelerator' },
+    { l:'Loan amount',      v: f(loanAmt),                 s: downPct + '% down' },
+    { l:'Lowest PITIA',     v: f(lowestPitia.pit) + '/mo', s: lowestPitia.label },
     ...(d.inv ? [
       { l:'Expected rental',  v: f(d.rentMonthly) + '/mo', s: 'Gross monthly' },
-      { l:'Net carry',        v: f(bl.nc) + '/mo',         s: 'Balanced scenario' },
+      { l:'Net carry',        v: f(featured.nc) + '/mo',   s: featured.label + ' scenario' },
     ] : [
-      { l:'Monthly payment',  v: f(bl.pit) + '/mo', s: 'Balanced scenario' },
+      { l:'Monthly payment',  v: f(featured.pit) + '/mo',  s: featured.label + ' scenario' },
     ]),
-    { l:'Equity at 10 yrs', v: fk(bl.eq),           s: 'Balanced scenario' },
+    { l:'Equity at 10 yrs', v: fk(featured.eq),            s: featured.label + ' scenario' },
   ];
   document.getElementById('kg').innerHTML = kpis.map(k =>
     `<div class="kc"><div class="kl">${k.l}</div><div class="kv">${k.v}</div>${k.s ? `<div class="ks">${k.s}</div>` : ''}</div>`
   ).join('');
 
-  // Scenario cards
-  document.getElementById('sg').innerHTML = S.map((s,i) => `
-    <div class="sc${s.ft ? ' ft' : ''}" onclick="togglePick(${i})">
+  // Scenario cards — four layers, mandatory on every card: Product, Strategy, Why, Outcome
+  const sg = document.getElementById('sg');
+  sg.className = 'sg' + (S.length === 1 ? ' sg-solo' : '');
+  sg.innerHTML = S.map((s, i) => {
+    const dPct = d.purchasePrice ? Math.round(s.downPayment / d.purchasePrice * 100) : 0;
+    const isFeatured = s.label === featured.label;
+    let badgeText = '';
+    if (isFeatured) {
+      badgeText = S.length === 1 ? 'Your scenario' : "Scott's pick";
+    }
+    return `
+    <div class="sc${isFeatured ? ' ft' : ''}" onclick="togglePick(${i})">
       <div class="pick-indicator">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      <div class="sh">
-        <div class="sn">${s.label}</div>
-        ${s.ft ? '<div class="sb">Most balanced path</div>' : ''}
+      <div class="sc-product">
+        <div class="sc-product-type">${s.loanType}</div>
+        <div class="sc-product-terms">${s.rate.toFixed(3)}% · ${s.term}yr · ${s.pts} pts · ${dPct}% down</div>
       </div>
+      <div class="sh">
+        <div class="sn">${strategyIcon(s.label)}${s.label}</div>
+        ${badgeText ? `<div class="sb">${badgeText}</div>` : ''}
+      </div>
+      <div class="sc-why">${WHY_SENTENCES[s.label]}</div>
       <div class="sm">
-        <div class="mr"><span class="ml2">Rate</span><span class="mv lg p">${s.rate.toFixed(3)}%</span></div>
-        <div class="mr"><span class="ml2">Points</span><span class="mv">${s.pts} (${f(loanAmt * s.pts / 100)})</span></div>
         <div class="mr"><span class="ml2">P&I</span><span class="mv">${f(s.pi)}/mo</span></div>
         <div class="mr"><span class="ml2">Total PITIA</span><span class="mv lg p">${f(s.pit)}/mo</span></div>
         ${d.inv ? `<div class="mr"><span class="ml2">Net carry</span><span class="mv">${f(s.nc)}/mo</span></div>` : ''}
         <div class="mr"><span class="ml2">Cash to close</span><span class="mv">${f(s.ctc)}</span></div>
+        <div class="mr"><span class="ml2">Total interest (${s.term}yr)</span><span class="mv">${f(s.totalInterest)}</span></div>
         <div class="mr"><span class="ml2">Equity at 10 yrs</span><span class="mv">${f(s.eq)}</span></div>
+        <div class="mr"><span class="ml2">Payoff date</span><span class="mv">${s.payoffDate}</span></div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   // Re-apply active pick highlight after re-render
   if (activePick !== null) {
@@ -586,16 +699,20 @@ function render() {
 
   // Comparison table
   const rows = [
-    ['Rate',                s => s.rate.toFixed(3) + '%'],
-    ['Points',              s => s.pts + ' (' + f(loanAmt * s.pts / 100) + ')'],
-    ['Monthly P&I',         s => f(s.pi),  true],
-    ['Monthly PITIA',       s => f(s.pit), true],
+    ['Loan type',                  s => s.loanType],
+    ['Term',                       s => s.term + ' years'],
+    ['Rate',                       s => s.rate.toFixed(3) + '%'],
+    ['Points',                     s => s.pts + ' (' + f(s.loanAmount * s.pts / 100) + ')'],
+    ['Monthly P&I',                s => f(s.pi),  true],
+    ['Monthly PITIA',              s => f(s.pit), true],
     ...(d.inv ? [['Net carry vs rent', s => f(s.nc) + '/mo']] : []),
-    ['Cash to close',       s => f(s.ctc)],
-    ['10yr interest paid',  s => f(s.hi)],
-    ['10yr principal paid', s => f(s.hp)],
-    ['Remaining balance',   s => f(s.rb)],
-    ['Equity at 10 years',  s => f(s.eq)],
+    ['Cash to close',              s => f(s.ctc)],
+    ['10yr interest paid',         s => f(s.hi)],
+    ['10yr principal paid',        s => f(s.hp)],
+    ['Remaining balance (10yr)',   s => f(s.rb)],
+    ['Total interest (full term)', s => f(s.totalInterest)],
+    ['Payoff date',                s => s.payoffDate],
+    ['Equity at 10 years',         s => f(s.eq)],
   ];
   document.getElementById('tbl').innerHTML =
     `<thead><tr><th>Metric</th>${S.map(s=>`<th>${s.label}</th>`).join('')}</tr></thead><tbody>` +
@@ -605,11 +722,11 @@ function render() {
 
   // Equity bars
   const mx = Math.max(...S.map(s => s.eq));
-  document.getElementById('eb').innerHTML = S.map((s,i) => {
+  document.getElementById('eb').innerHTML = S.map(s => {
     const pct = mx > 0 ? (s.eq / mx * 100).toFixed(1) : 0;
     return `<div class="er">
       <div class="el">${s.label}</div>
-      <div class="et"><div class="ef" data-w="${pct}" style="width:0%;background:${CL[i]}"><span class="efl">${fk(s.eq)}</span></div></div>
+      <div class="et"><div class="ef" data-w="${pct}" style="width:0%;background:${colorFor(s.label)}"><span class="efl">${fk(s.eq)}</span></div></div>
       <div class="ev">${f(s.eq)}</div>
     </div>`;
   }).join('');
@@ -623,7 +740,6 @@ function rebuildCharts(S) {
   if (!S) S = buildScenarios(DATA);
   if (ch1) ch1.destroy();
   if (ch2) ch2.destroy();
-  const c  = gc();
   const dk = document.documentElement.getAttribute('data-theme') === 'dark';
   const gr = dk ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
   const tk = dk ? '#797876' : '#7a7974';
@@ -633,7 +749,12 @@ function rebuildCharts(S) {
     type: 'bar',
     data: {
       labels: S.map(s => s.label),
-      datasets: [{ data: S.map(s => s.pit), backgroundColor: c.map(x => x + 'cc'), borderColor: c, borderWidth: 2, borderRadius: 6 }]
+      datasets: [{
+        data: S.map(s => s.pit),
+        backgroundColor: S.map(s => colorFor(s.label) + 'cc'),
+        borderColor: S.map(s => colorFor(s.label)),
+        borderWidth: 2, borderRadius: 6, maxBarThickness: 90
+      }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -650,15 +771,15 @@ function rebuildCharts(S) {
     type: 'line',
     data: {
       labels: yr,
-      datasets: S.map((s,i) => ({
-        label: s.label, data: s.cv, borderColor: c[i], backgroundColor: c[i] + '18',
+      datasets: S.map(s => ({
+        label: s.label, data: s.cv, borderColor: colorFor(s.label), backgroundColor: colorFor(s.label) + '18',
         borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5, tension: 0.3, fill: false
       }))
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'bottom', labels: { color: tk, font: fn, boxWidth: 12, padding: 10 }},
+        legend: { display: S.length > 1, position: 'bottom', labels: { color: tk, font: fn, boxWidth: 12, padding: 10 }},
         tooltip: { callbacks: { label: x => ' ' + x.dataset.label + ': $' + x.raw.toLocaleString() }}
       },
       scales: {
