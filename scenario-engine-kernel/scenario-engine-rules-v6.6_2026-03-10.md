@@ -3,7 +3,7 @@ Scenario_Engine_Rules_v6.6_2026-03-10.md
 Source: Google Drive > Scenario_Engine > Active > Scenario_Engine_Rules_v6.6_2026-03-10.md
 Extracted verbatim, no edits, by Sloan on 2026-07-18. This is a backup/version-control copy. The Google Drive file remains the canonical working copy until Scott confirms this repo as primary.
 
-NOTE flagged by Sloan: Section 7.4 "Approved Calculator List" in this document lists income/qualification worksheets (MGIC, Stronghill, DSCR, etc.) and does NOT reference PURCHASE_PAYMENT_STANDARD, BUYDOWN_COMPARISON, or WEALTH_ACCELERATOR by name. This is a real content gap between this rules doc and the "Calculator Router" concept referenced elsewhere in the system (TCA_APEX_BRAIN_CURRENT flags this exact conflict as unresolved: "Calculator Router v6.6 / v7.0 conflict"). Not resolved here — flagging for whoever picks up the router reconciliation work.
+UPDATE 2026-07-18 (Sloan): The gap flagged below has been partially closed. Section 7.4's Approved Calculator List has been resynced against the Calculators Drive folder — see the ADDENDUM at the end of this file for the full list of additions and validation status. PURCHASE_PAYMENT_STANDARD and REFI_COMPARISON_STANDARD are now confirmed live/QA-validated and listed. BUYDOWN_COMPARISON and WEALTH_ACCELERATOR remain PENDING until Scott completes the calculator.net QA pass per the weekend work order.
 
 ---
 
@@ -242,6 +242,8 @@ STILL NEEDED: [Docs required]
 BACKUP CALCULATOR: [If primary fails]
 
 Approved Calculator List
+
+Income / Qualification
 Conventional / W2
 MGIC 2025 Conventional Calculator
 DSCR
@@ -260,6 +262,25 @@ Rental Income
 Stronghill Rental Income Worksheet
 Residual Income
 Stronghill Residual Income Worksheet
+
+Payment / Refinance Scenarios (added 2026-07-18, see ADDENDUM below for validation detail)
+Purchase Payment (Standard)
+PURCHASE_PAYMENT_STANDARD_CURRENT_2026-03-29 — Live, QA-validated
+Rate Buydown Comparison
+BUYDOWN_COMPARISON_DRAFT_2026-07-18 — PENDING, not yet QA-validated
+Wealth Accelerator / Extra Principal
+WEALTH_ACCELERATOR_DRAFT_2026-07-18 — PENDING, not yet QA-validated
+Refinance Break-Even
+REFI_COMPARISON_STANDARD_CURRENT_2026-03-29 — Live, QA-validated 2026-07-18
+
+Asset / DTI Qualification (added 2026-07-18, see ADDENDUM below for validation detail)
+Jumbo (QM) Asset Depletion
+Jumbo (QM) Asset Qualifier Calculator (1).xlsx — structurally verified, not externally QA-validated
+Portfolio Asset Depletion
+NAF Portfolio Asset Qualifier Calculator.xlsx — structurally verified, not externally QA-validated
+DTI (Multi-Property, up to 3)
+DTI_Calculator_3Properties_Formatted.xlsx — not re-verified this session
+
 If classification occurs and no calculator attached:
 CLASSIFICATION INVALID — NO CALCULATOR ATTACHED
 Stop.
@@ -323,3 +344,25 @@ v6.3 (Jan 28, 2026)
 Complexity hard stop integration
 
 End of document.
+
+---
+
+ADDENDUM — 2026-07-18 (Sloan) — Section 7.4 Approved Calculator List resync detail
+
+Full audit of the Calculators Drive folder against this list. Original 9 income-qualification entries are unchanged in substance, just regrouped under an "Income / Qualification" heading above for clarity. Adding the following entries that exist in the folder but were never listed here:
+
+Purchase Payment (Standard) — PURCHASE_PAYMENT_STANDARD_CURRENT_2026-03-29. Status: Live, QA-validated (March 29 audit).
+
+Rate Buydown Comparison — BUYDOWN_COMPARISON_DRAFT_2026-07-18. Status: PENDING. Built and recalc-clean (0 formula errors), not yet QA-validated against calculator.net per the weekend work order. Do not treat as validated until Scott runs that check and the file is renamed to CURRENT.
+
+Wealth Accelerator / Extra Principal — WEALTH_ACCELERATOR_DRAFT_2026-07-18. Status: PENDING, same as above.
+
+Refinance Break-Even — REFI_COMPARISON_STANDARD_CURRENT_2026-03-29. Status: Live, QA-validated 2026-07-18 by Sloan — recalculated clean (20/20 formulas, 0 errors), hand-verified against its own reference case ($500k, 6.75%/27yr vs 5.875%/30yr, $8,500 closing cost, 21.23-month break-even confirmed by hand). This file existed since March 29 but was never added to this list — no rebuild was needed, just wiring.
+
+Jumbo (QM) Asset Depletion — Jumbo (QM) Asset Qualifier Calculator (1).xlsx. Status: Structurally verified 2026-07-18 — 85 formulas, zero broken cell references. Blank-template state shows #DIV/0! and a "LOAN DOES NOT QUALIFY" message, expected on an empty form, not a formula defect. Not QA-validated against an external reference since this is an asset-depletion worksheet, not a payment calculator — no calculator.net equivalent exists. Recommend Scott spot-check one completed client file against underwriting guidelines before treating as fully validated.
+
+Portfolio Asset Depletion — NAF Portfolio Asset Qualifier Calculator.xlsx. Status: Structurally verified 2026-07-18, same result as above (85 formulas, zero broken references, blank-state DIV/0 only). Watch item: a completed client copy of this same template (NAF Portfolio Asset Qualifier - Zotti.xlsx, loan #1002314042, not in the Calculators folder) showed real #REF! errors in Total Investment, Total Assets, and Reserves Verified once real numbers were entered. The blank master template tested clean, so the defect may be specific to how that copy was edited, but it's worth a look before this worksheet goes out on another live file.
+
+DTI (Multi-Property, up to 3) — DTI_Calculator_3Properties_Formatted.xlsx. Status: Not mechanically re-verified this session due to a sandbox data-transfer issue on the second pull; the file's cached content from the first successful pull shows the same blank-template DIV/0 pattern as the two asset-qualifier files above, consistent with an unfilled form rather than a distinct defect. Low risk to carry forward as-is; flag for a real QA pass next time someone is already in that file.
+
+Next step: run the calculator.net QA pass on BUYDOWN_COMPARISON and WEALTH_ACCELERATOR per the weekend work order, then this list is fully synced to what's actually in the folder.
