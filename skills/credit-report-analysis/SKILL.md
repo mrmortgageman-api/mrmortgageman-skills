@@ -69,6 +69,15 @@ overlay" rather than asserting a number.
 **Jumbo / Non-QM** — real cliff is usually 680–720, not 620. Flag as "confirm against current
 NAF jumbo/non-QM buy box" — do not assert specific floors from memory.
 
+**Medical Professional / Physician programs** — Scott has provided actual program guideline
+PDFs (Redwood Sequoia, Silver Hill Capital, Quorum Doctor Loan). Read
+`references/medical-professional-programs.md` for the real score/LTV/loan-amount breakpoints
+across these three programs before answering any tier-crossing question tied to a medical
+professional borrower. Do not guess at these figures — they're program-specific and differ
+meaningfully from each other (e.g. Silver Hill has a hard 700 floor; Redwood opens at 680).
+Re-confirm the "last confirmed" date at the top of that file before quoting a client, since
+these matrices revise periodically.
+
 ## Step 3 — CALCULATOR AUTHORITY RULE applies here
 
 No validated point-impact calculator exists for "pay down X, gain Y points." Do not invent
