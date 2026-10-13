@@ -1,6 +1,6 @@
 ---
 name: loan-strategy-presenter
-description: Builds the MMM Loan Strategy Presenter — a branded, interactive HTML presentation tool for Stage 2 Pre-Offer Strategy Calls. Reads the 1003 PDF, takes live rates from Scott, builds one to four scenarios with real math, writes the recommendation in Scott's voice, and renders the full client-facing tool ready for screen share and PDF leave-behind. Each scenario card shows four layers: Product, Strategy, Why, Outcome, plus a strategy icon. Use this skill whenever Scott asks to build a loan strategy presentation, run scenarios for a borrower, generate a TCA, or prepare for a Stage 2 call. Trigger phrases include: "build the strategy", "run the scenarios", "generate the TCA", "prep the Stage 2 call", "build the presenter", "loan strategy for [borrower]", or any time a 1003 is uploaded and rates are provided. Investment files show net carry. Purchase files hide net carry and show plain-language tradeoff notes only.
+description: Builds the MMM Loan Strategy Presenter — a branded, interactive HTML presentation tool for Stage 2 Pre-Offer Strategy Calls. Reads the 1003 PDF, takes live rates from Scott, builds one to four scenarios with real math, writes the recommendation in Scott's voice, and renders the full client-facing tool ready for screen share and PDF leave-behind. Each scenario card shows four layers: Product, Strategy, Why, Outcome, plus a strategy icon. Use this skill whenever Scott asks to build a loan strategy presentation, run scenarios for a borrower, generate a TCA, or prepare for a Stage 2 call. Trigger phrases include: "build the strategy", "run the scenarios", "generate the TCA", "prep the Stage 2 call", "build the presenter", "loan strategy for [borrower]", any time a 1003 is uploaded and rates are provided, or when a Scenario Engine TCA Data Block (v7.1.0) is pasted. Investment files show net carry. Purchase files hide net carry.
 ---
 
 # MMM Loan Strategy Presenter
@@ -27,6 +27,43 @@ This skill produces a complete HTML artifact that Scott uses to:
 3. Include a live Calendly booking link for the strategy call
 
 The tool is branded with Scott's logo, color system, and voice. It is not a draft. It is a finished client-facing deliverable.
+
+---
+
+## TEMPLATE (ALWAYS START HERE)
+
+Build every presenter from `MMM_Loan_Strategy_Presenter.html` in this skill's folder. Read it, fill in the `DATA` object at the top of its script, and render it. Do not rebuild the layout, CSS, charts, edit drawer, icons, or why-sentences from scratch. They are locked in the template.
+
+`DATA` fields: `borrowerName`, `subtitle`, `reportDate`, `closingDate`, `fileTypeLabel`, `inv` (true for investment), `purchasePrice`, `downPayment` (dollars), `loanAmount`, `taxMonthly`, `insMonthly`, `hoaMonthly`, `rentMonthly`, `recScenario` (label), `recText` (Scott's recommendation), and `scenarios` (1 to 4 entries: `label`, `loanType`, `termYears`, `rate` as a percent like 6.25, `pts`, `loanAmount`, `downPayment`, `featured`). Delete unused scenario entries. Never leave placeholder entries with a rate of 0.
+
+Save the finished file as `TCA | {BorrowerLastName} | {LoanNumber} | {YYYY-MM-DD}T{HHmm}.html` (same naming law as the Scenario Engine). Use TBD for a loan number not yet assigned.
+
+---
+
+## TWO WAYS IN
+
+**Path A, from a 1003:** use the input rules below and ask Scott for labeled rates.
+
+**Path B, from a Scenario Engine TCA Data Block (kernel v7.1.0):** do not ask for rates. Map the JSON straight into `DATA`:
+
+| TCA Data Block | Template DATA |
+|---|---|
+| borrowerName | borrowerName |
+| purchasePrice | purchasePrice |
+| downPaymentPct x purchasePrice / 100 | downPayment (dollars) |
+| loanAmount | loanAmount |
+| monthlyTax | taxMonthly |
+| monthlyInsurance | insMonthly |
+| hoaMonthly | hoaMonthly |
+| analysisDate | reportDate |
+| scenarios[].label | scenarios[].label (map retired labels forward: Current Loan to Today's Rate, Conservative to Fastest Payoff, Balanced to Best Monthly Value, Wealth Accelerator to Maximum Savings) |
+| scenarios[].rate (decimal 0.0625) | scenarios[].rate x 100 (percent 6.25) |
+| scenarios[].term | scenarios[].termYears |
+| scenarios[].points | scenarios[].pts |
+| featured (label) | featured: true on that scenario; also recScenario |
+| loanType | scenarios[].loanType (expand to a full product name, e.g. "30-Year Conventional Fixed") |
+
+Skip any scenario with `enabled: false`. If the block has `mode: "refi"`, stop and tell Scott this presenter is built for purchase and investment files; the refi TCA renders on https://mrmortgageman-tca.vercel.app/tca-mvp. Pull taxes, insurance, and rent from the 1003 only if the Data Block leaves them out, and say so.
 
 ---
 
@@ -237,7 +274,7 @@ Scott W Thompson | MrMortgageMan™ · NMLS #1864494 · New American Funding · 
 
 Three numbered steps in the navy block:
 1. Application submitted. You are already in the system and moving forward.
-2. Pre-approval letter will be in your inbox within 24 hours.
+2. Pre-approval letter comes next. I will confirm the timing with you directly.
 3. Book your Pre-Offer Strategy Call. We lock in live pricing, review buydown options, and make sure you are ready before any offer goes out.
 
 Include live Calendly button: "Book your strategy call"
@@ -265,15 +302,15 @@ Dark mode toggle and Print/Save PDF button always in header.
 
 ## EXECUTION FLOW
 
-Step 1. Read the 1003. Extract all scenario-relevant fields. Note file type.
-Step 2. Ask Scott for one to four labeled rates (one ask, paste format).
+Step 1. Read the template, then the 1003 or the TCA Data Block. Extract all scenario-relevant fields. Note file type.
+Step 2. Path A: ask Scott for one to four labeled rates (one ask, paste format). Path B: skip this step, the rates are in the Data Block.
 Step 3. Calculate all math. Build exactly the scenario cards he provided rates for.
 Step 4. Populate all four layers plus the strategy icon on every card. Pull Why-layer sentences from the locked table, do not write new ones.
 Step 5. Write the recommendation in Scott's voice.
 Step 6. Render the complete HTML artifact.
 Step 7. Say: "Ready for your screen share. Print button is live. Calendly link is active."
 
-Do not ask Scott for anything beyond the rates. Do not show partial output. Deliver the complete tool in one shot.
+Do not ask Scott for anything beyond the rates (Path A) or anything at all (Path B). Do not show partial output. Deliver the complete tool in one shot.
 
 ---
 
@@ -291,6 +328,8 @@ Do not ask Scott for anything beyond the rates. Do not show partial output. Deli
 - [ ] Calendly link correct
 - [ ] Contact info uses 925-512-5626 (never 925-403-4217)
 - [ ] Compliance footer included
+- [ ] Next steps promise no turnaround time (no hours, no days). Every client's timeline is set one to one.
+- [ ] Built from the template file, DATA populated, no placeholder text left
 - [ ] Calendly button hidden on print
 
 Mortgage Made Simple.
