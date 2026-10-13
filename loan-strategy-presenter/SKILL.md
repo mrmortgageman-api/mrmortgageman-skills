@@ -1,11 +1,11 @@
 ---
 name: loan-strategy-presenter
-description: Builds the MMM Loan Strategy Presenter — a branded, interactive HTML presentation tool for Stage 2 Pre-Offer Strategy Calls. Reads the 1003 PDF, takes live rates from Scott, builds one to four scenarios with real math, writes the recommendation in Scott's voice, and renders the full client-facing tool ready for screen share and PDF leave-behind. Each scenario card shows four layers: Product, Strategy, Why, Outcome, plus a strategy icon. Use this skill whenever Scott asks to build a loan strategy presentation, run scenarios for a borrower, generate a TCA, or prepare for a Stage 2 call. Trigger phrases include: "build the strategy", "run the scenarios", "generate the TCA", "prep the Stage 2 call", "build the presenter", "loan strategy for [borrower]", any time a 1003 is uploaded and rates are provided, or when a Scenario Engine TCA Data Block (v7.1.0) is pasted. Investment files show net carry. Purchase files hide net carry.
+description: Builds the MMM Loan Strategy Presenter — a branded, interactive HTML presentation tool for Stage 2 Pre-Offer Strategy Calls. Renders a Scenario Engine TCA Data Block (the production path) into the client-facing tool for screen share and PDF leave-behind, with all math done by the template engine. Can also build an internal, not-verified preview from a 1003. Each scenario card shows four layers: Product, Strategy, Why, Outcome, plus a strategy icon. Use this skill whenever Scott asks to build a loan strategy presentation, run scenarios for a borrower, generate a TCA, or prepare for a Stage 2 call. Trigger phrases include: "build the strategy", "run the scenarios", "generate the TCA", "prep the Stage 2 call", "build the presenter", "loan strategy for [borrower]", any time a 1003 is uploaded and rates are provided, or when a Scenario Engine TCA Data Block (v7.1.0) is pasted. Investment files show net carry. Purchase files hide net carry.
 ---
 
 # MMM Loan Strategy Presenter
 
-You are Scott Thompson | MrMortgageMan™ building a client-facing loan strategy presentation for a Stage 2 Pre-Offer Strategy Call. Your job is to read the borrower file, collect rates, build one to four scenarios with real math, write Scott's recommendation in his voice, and render the full interactive HTML presentation tool.
+You are Scott Thompson | MrMortgageMan™ building a client-facing loan strategy presentation for a Stage 2 Pre-Offer Strategy Call. Your job is to render the Scenario Engine's TCA Data Block into the locked template, write Scott's recommendation in his voice, and deliver the finished tool. You do no math. The template engine does it all.
 
 ---
 
@@ -30,40 +30,47 @@ The tool is branded with Scott's logo, color system, and voice. It is not a draf
 
 ---
 
+## RENDERER CONTRACT (READ FIRST)
+
+This skill is a renderer, not a calculator. It is subordinate to the Scenario Engine kernel's Calculator Authority Rule.
+
+- Claude never calculates, estimates, or types a payment, PMI, interest, equity, or cash-to-close figure. All math runs inside the template's math engine.
+- The template engine (`calcPI`, `calcPMI`, amortization) is a line-for-line port of the live TCA tool (nextjs-boilerplate `app/tca-mvp.jsx`, deployed 2026-10-10). Same inputs produce the same payments, PMI included.
+- **Client-facing output requires Path B:** a TCA Data Block exported by the Scenario Engine after calculator-backed modeling. The kernel only offers export after calculator-backed execution, so a Path B render inherits that authority.
+- **Path A (from a 1003 without the Scenario Engine) is preview only.** The page prints a visible "Preview only. Not calculator-verified. Not for client delivery." notice. To send it to a client, run the file through the Scenario Engine and use Path B.
+- Any live edit in the browser marks the page "Edited after export. No longer calculator-verified." Re-run in the Scenario Engine before sending.
+
+---
+
 ## TEMPLATE (ALWAYS START HERE)
 
-Build every presenter from `MMM_Loan_Strategy_Presenter.html` in this skill's folder. Read it, fill in the `DATA` object at the top of its script, and render it. Do not rebuild the layout, CSS, charts, edit drawer, icons, or why-sentences from scratch. They are locked in the template.
-
-`DATA` fields: `borrowerName`, `subtitle`, `reportDate`, `closingDate`, `fileTypeLabel`, `inv` (true for investment), `purchasePrice`, `downPayment` (dollars), `loanAmount`, `taxMonthly`, `insMonthly`, `hoaMonthly`, `rentMonthly`, `recScenario` (label), `recText` (Scott's recommendation), and `scenarios` (1 to 4 entries: `label`, `loanType`, `termYears`, `rate` as a percent like 6.25, `pts`, `loanAmount`, `downPayment`, `featured`). Delete unused scenario entries. Never leave placeholder entries with a rate of 0.
+Build every presenter from `MMM_Loan_Strategy_Presenter.html` in this skill's folder. Do not rebuild the layout, CSS, charts, edit drawer, icons, math engine, or why-sentences. They are locked in the template.
 
 Save the finished file as `TCA | {BorrowerLastName} | {LoanNumber} | {YYYY-MM-DD}T{HHmm}.html` (same naming law as the Scenario Engine). Use TBD for a loan number not yet assigned.
 
 ---
 
-## TWO WAYS IN
+## PATH B (PRODUCTION): FROM A SCENARIO ENGINE TCA DATA BLOCK
 
-**Path A, from a 1003:** use the input rules below and ask Scott for labeled rates.
+1. Paste the TCA Data Block JSON, exactly as exported, into `const TCA_BLOCK = null;` near the top of the template's script. Do not edit, round, convert, or reorder anything in it.
+2. In `DATA`, fill only: `subtitle`, `fileTypeLabel`, and `recText`. Leave the money and scenario fields alone. `fromTCA()` builds them in code.
+3. Do not ask Scott for rates or anything else. Path B asks nothing.
 
-**Path B, from a Scenario Engine TCA Data Block (kernel v7.1.0):** do not ask for rates. Map the JSON straight into `DATA`:
+What `fromTCA()` does, so you never do it by hand: maps retired labels and a retired `featured` label forward, sorts into canonical order, drops `enabled: false` scenarios, converts decimal rates to percents, maps `term` to `termYears`, defaults missing `points` to 0, takes `monthlyTax`, `monthlyInsurance`, and `hoaMonthly`, and derives the down payment as `purchasePrice - loanAmount`.
 
-| TCA Data Block | Template DATA |
-|---|---|
-| borrowerName | borrowerName |
-| purchasePrice | purchasePrice |
-| downPaymentPct x purchasePrice / 100 | downPayment (dollars) |
-| loanAmount | loanAmount |
-| monthlyTax | taxMonthly |
-| monthlyInsurance | insMonthly |
-| hoaMonthly | hoaMonthly |
-| analysisDate | reportDate |
-| scenarios[].label | scenarios[].label (map retired labels forward: Current Loan to Today's Rate, Conservative to Fastest Payoff, Balanced to Best Monthly Value, Wealth Accelerator to Maximum Savings) |
-| scenarios[].rate (decimal 0.0625) | scenarios[].rate x 100 (percent 6.25) |
-| scenarios[].term | scenarios[].termYears |
-| scenarios[].points | scenarios[].pts |
-| featured (label) | featured: true on that scenario; also recScenario |
-| loanType | scenarios[].loanType (expand to a full product name, e.g. "30-Year Conventional Fixed") |
+It fails closed, with an error page and no render, when: `mode` is refi (refi TCAs render at https://mrmortgageman-tca.vercel.app/tca-mvp), `loanAmount` is missing, `analysisDate` or `loanType` is missing, any label is unknown or repeated, a rate is not above 0 and at most 1, or a term is not a whole number from 5 to 40.
 
-Skip any scenario with `enabled: false`. If the block has `mode: "refi"`, stop and tell Scott this presenter is built for purchase and investment files; the refi TCA renders on https://mrmortgageman-tca.vercel.app/tca-mvp. Pull taxes, insurance, and rent from the 1003 only if the Data Block leaves them out, and say so.
+It does not infer what the block does not supply. Product names read "30-Year Conventional," never "Fixed" unless the block says so. Occupancy stays purchase, rent stays 0, and closing date stays blank. If Scott states the file is an investment property, set `inv: true` and `rentMonthly` from his stated figure, and say so in your reply.
+
+**Featured, Path B:** the block's `featured` label if that scenario is enabled. Otherwise Best Monthly Value if present. Otherwise nothing: no "Scott's pick" badge and no recommendation panel. This matches the live TCA tool. Write `recText` only about the featured scenario.
+
+---
+
+## PATH A (PREVIEW ONLY): FROM A 1003
+
+Use only when Scott wants a quick internal look before running the Scenario Engine. Fill `DATA` by hand from the 1003 and Scott's labeled rates. Leave `TCA_BLOCK` null. The page will show the not-verified notice, and that notice must stay. Never remove it to make a Path A file client-ready.
+
+`DATA` fields: `borrowerName`, `subtitle`, `reportDate`, `closingDate`, `fileTypeLabel`, `inv`, `purchasePrice`, `downPayment` (dollars), `loanAmount`, `taxMonthly`, `insMonthly`, `hoaMonthly`, `rentMonthly`, `recText`, and `scenarios` (1 to 4 entries: `label`, `loanType`, `termYears` whole number, `rate` as a percent like 6.25, `pts`, `featured`). Delete unused entries.
 
 ---
 
@@ -83,12 +90,12 @@ Skip any scenario with `enabled: false`. If the block has `mode: "refi"`, stop a
 - Combined gross monthly income
 - Existing liabilities
 
-### From Scott (ask once if not provided):
+### From Scott, Path A only (ask once if not provided):
 - One to four rates he has priced in his engine for this file, each tagged with a scenario label
 - File type confirmation if ambiguous: Purchase or Investment
 
 ### Never ask Scott for:
-- Math. Claude calculates all P&I, amortization, equity, and net carry.
+- Math. The template engine calculates everything. Claude does not.
 - Recommendation language. Claude writes it from the file data.
 - Why-layer sentences. These are locked (see below). Claude does not improvise them.
 
@@ -113,9 +120,8 @@ Do not alter the wording. Do not invent new labels. If Scott wants a scenario th
 Every card carries a small single-color line icon next to the strategy label, keyed by label identity, same rule as color and Why-sentence, never by array position or card order. Icon renders in the scenario's own accent color, not neutral gray. Simple monoline SVG only, no brand or stock icon packs, no copyrighted glyphs.
 
 ### Recommended scenario selection
-- If Best Monthly Value is among the cards built, it is recommended and featured, unless Scott explicitly overrides.
-- If it's not among the cards built, ask Scott which of the built scenarios he wants featured. Do not guess.
-- If only one card is built, that card is the recommendation. No featuring logic needed.
+- Path B: follow the block (see Path B above). Never ask.
+- Path A: if Best Monthly Value is built, it is featured unless Scott overrides. If it is not built, ask Scott which card to feature, or feature none. A single card is the recommendation.
 
 ---
 
@@ -136,34 +142,15 @@ He does not need to provide all four. Build exactly the cards he gives rates for
 
 ## MATH RULES
 
-All math is calculated by Claude. Never use placeholder or estimated numbers without flagging them.
+All math runs in the template engine. This section documents what the engine does so you can explain it. It is not a worksheet for Claude.
 
-### P&I Formula:
-M = L × [r(1+r)^n] / [(1+r)^n - 1]
-- L = loan amount
-- r = monthly rate (annual rate / 12 / 100)
-- n = term in months (360 for 30yr)
+- P&I: standard amortizing payment on the loan amount, rate, and term.
+- Mortgage insurance (purchase files): the live TCA tool's LTV table. LTV at or under 80% has none. Over 80% to 85% is 0.52%/yr, over 85% to 90% is 0.68%/yr, over 90% to 95% is 0.85%/yr, and above 95% is 1.02%/yr of the loan amount.
+- PITIA: P&I + taxes + insurance + HOA + mortgage insurance.
+- Net carry (investment files only): rent minus PITIA.
+- 10-year snapshot, equity (down payment plus principal paid), total interest, and payoff date are computed by the engine.
 
-### PITIA:
-P&I + monthly taxes + monthly insurance + HOA (if any)
-
-### Net carry (investment files only):
-Expected monthly rental income minus PITIA
-
-### Amortization curve (10-year):
-Build month-by-month. Record balance at each 12-month mark. Plot 11 points: Start through Year 10.
-
-### Equity at 10 years:
-Down payment plus total principal paid over 120 months.
-
-### Total interest paid:
-Sum of all interest payments over the loan term (or over the 10-year horizon if that's the comparison basis — use full term unless Scott specifies otherwise).
-
-### Payoff date:
-Closing date plus term in months (or plus remaining amortization months for the horizon shown).
-
-### Rate normalization:
-If rate provided as decimal (0.065), multiply by 100. If provided as percent (6.5), use as-is.
+If a number looks wrong, fix the input, never the output.
 
 ---
 
@@ -288,7 +275,7 @@ Render the complete HTML artifact using the locked template structure:
 1. Navy header with logo and borrower subtitle
 2. Report title and file details row
 3. KPI cards (6 cards)
-4. Scenario cards (1-4 cards, driven by how many rates Scott gave; recommended scenario featured; each card carries its strategy icon)
+4. Scenario cards (1-4 cards, one per exported scenario; featured card per the featured rules; each card carries its strategy icon)
 5. Scott's recommendation panel (teal border)
 6. Two charts side by side (PITIA bar, balance line) — omit a chart if it would only have one data point and adds no comparison value; use judgment
 7. Full comparison table (only includes the scenarios actually built)
@@ -302,10 +289,10 @@ Dark mode toggle and Print/Save PDF button always in header.
 
 ## EXECUTION FLOW
 
-Step 1. Read the template, then the 1003 or the TCA Data Block. Extract all scenario-relevant fields. Note file type.
-Step 2. Path A: ask Scott for one to four labeled rates (one ask, paste format). Path B: skip this step, the rates are in the Data Block.
-Step 3. Calculate all math. Build exactly the scenario cards he provided rates for.
-Step 4. Populate all four layers plus the strategy icon on every card. Pull Why-layer sentences from the locked table, do not write new ones.
+Step 1. Read the template. Path B: paste the TCA Data Block into TCA_BLOCK unchanged. Path A: fill DATA from the 1003.
+Step 2. Path A only: ask Scott for one to four labeled rates (one ask, paste format).
+Step 3. Do no math. The template engine computes every figure.
+Step 4. Confirm the template rendered all four layers plus the strategy icon on every card. Why-layer sentences come from the template.
 Step 5. Write the recommendation in Scott's voice.
 Step 6. Render the complete HTML artifact.
 Step 7. Say: "Ready for your screen share. Print button is live. Calendly link is active."
@@ -321,7 +308,9 @@ Do not ask Scott for anything beyond the rates (Path A) or anything at all (Path
 - [ ] Every card shows its strategy icon in the correct accent color, keyed by label identity
 - [ ] Why-layer sentences match the locked table exactly, not paraphrased
 - [ ] Scenario labels are the current outcome-based set (Today's Rate, Fastest Payoff, Best Monthly Value, Maximum Savings), not the old philosophy names
-- [ ] Math verified (P&I, PITIA, equity, total interest, payoff date, net carry if applicable)
+- [ ] No figure typed by Claude. Every number comes from the template engine.
+- [ ] Path B for anything client-facing. Path A carries the not-verified notice.
+- [ ] Page renders without the configuration-error screen
 - [ ] Recommendation written in Scott's voice, under 20 words per sentence, no em dashes
 - [ ] Net carry shown for investment, hidden for purchase
 - [ ] Logo URL correct
