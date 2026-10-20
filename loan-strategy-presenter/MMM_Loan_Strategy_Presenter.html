@@ -471,7 +471,9 @@ function fromTCA(block, base) {
         label,
         loanType:   `${s.term}-Year ${typeName}`,  // e.g. "30-Year Conventional"
         termYears:  s.term,
-        rate:       typeof s.rate === 'number' ? Math.round(s.rate * 100 * 100000) / 100000 : s.rate,
+        // Decimal -> percent at full precision. Never round the stored value;
+        // display code rounds separately (toFixed(3)).
+        rate:       typeof s.rate === 'number' ? s.rate * 100 : s.rate,
         pts:        s.points === undefined ? 0 : s.points,
         loanAmount: 0,
         downPayment: 0,
@@ -497,6 +499,13 @@ function fromTCA(block, base) {
     hoaMonthly:    block.hoaMonthly || 0,
     scenarios,
   }};
+}
+
+// Mirrors featureScenario() in the live TCA tool: the flagged scenario, else
+// Best Monthly Value, else nothing. Never silently feature the first card,
+// including a lone card. A single scenario is featured only when flagged.
+function pickFeatured(S) {
+  return S.find(s => s.featured) || S.find(s => s.label === 'Best Monthly Value') || null;
 }
 
 function renderError(errs) {
@@ -750,11 +759,7 @@ function render() {
   }
 
   const S = buildScenarios(d);
-  // Mirrors featureScenario() in the live TCA tool: the flagged scenario, else
-  // Best Monthly Value, else nothing. Never silently feature the first card.
-  // A lone card is the recommendation by definition.
-  const featured = S.find(s => s.featured) || S.find(s => s.label === 'Best Monthly Value')
-    || (S.length === 1 ? S[0] : null);
+  const featured = pickFeatured(S);
   const kpiBase  = featured || S.reduce((min, s) => s.pit < min.pit ? s : min, S[0]);
   const kpiNote  = s => s.label + (featured ? ' scenario' : ' (lowest payment)');
   const loanAmt  = d.loanAmount || (d.purchasePrice - d.downPayment);
